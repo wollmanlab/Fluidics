@@ -1,3 +1,4 @@
+from Pumps.Pump import *
 class SyringePump(Pump):
     """
     """
@@ -53,19 +54,19 @@ class SyringePump(Pump):
             pass
 
     def build_cmd_str(self,cmd, args=None):
-    """
-    Build a command string that can be sent to the arduino.
-    Input:
-        cmd (str): the command to send to the arduino, must not
-            contain a % character
-        args (iterable): the arguments to send to the command
-    @TODO: a strategy is needed to escape % characters in the args
-    """
-    if args:
-        args = '%'.join(map(str, args))
-    else:
-        args = ''
-    return "@{cmd}%{args}$!".format(cmd=cmd, args=args)
+        """
+        Build a command string that can be sent to the arduino.
+        Input:
+            cmd (str): the command to send to the arduino, must not
+                contain a % character
+            args (iterable): the arguments to send to the command
+        @TODO: a strategy is needed to escape % characters in the args
+        """
+        if args:
+            args = '%'.join(map(str, args))
+        else:
+            args = ''
+        return "@{cmd}%{args}$!".format(cmd=cmd, args=args)
 
         
 

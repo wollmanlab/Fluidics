@@ -1,7 +1,8 @@
-class Protocols:
+class Protocol:
     def __init__(self):
-
-    def get_steps(self,protocol,chambers,other)
+        self.verbose = True
+        self.protocols = {}
+    def get_steps(self,protocol,chambers,other):
         """ OVERWRITE"""
 
     def format(self,port='A',volume=0,speed=0,pause=0,direction='Forward'):

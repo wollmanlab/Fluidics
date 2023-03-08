@@ -1,9 +1,17 @@
 
+from Fluidics import *
+from Pumps.SyringePump import SyringePump as Pump
+from Protocols.SyringeProtocol import SyringeProtocol as Protocol
+from Valves.ViciValve import ViciValve as Valve
+
+
 class RamboFluidics(Fluidics):
-    def __init__(self):
-        self.Protocols = SyringeProtocols
-        self.Pump = SyringePump('COM6')
-        self.Valve = ViciValves('COM1')
+    def __init__(self,verbose):
+        self.Protocol = Protocol(verbose)
+        # self.Pump = Pump('COM6')
+        # self.Valve = Valve('COM1')
+        hybe_valve = 3
+        chamber_valve = 1
         self.Valve_Commands = {
                                 'Valve3':{'valve':2,'port':1},
                                 'Waste':{'valve':2,'port':10},
@@ -17,6 +25,8 @@ class RamboFluidics(Fluidics):
                             }
         for i in range(1,25):
             self.Valve_Commands['Hybe'+str(i)] = {'valve':hybe_valve,'port':i}
-            self.Valve_Commands[str(i)] = {'valve':chamber_valve,'port':i}
+            
+        for i in range(6):
+                self.Valve_Commands[chr(ord('A') + i)] = {'valve':chamber_valve,'port':i}
 
     

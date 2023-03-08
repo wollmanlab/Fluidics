@@ -1,3 +1,4 @@
+from Valves.Valve import *
 class ViciValve(Valve):
     """
 
@@ -27,7 +28,7 @@ class ViciValve(Valve):
         message = "CP\r"
         response = self.inquireAndRespond(valve_ID, message)
         if response[0] == "Negative Acknowledge":
-            print "Move failed: " + str(response)
+            print("Move failed: " + str(response))
         if response[1]:
             return response[3].split(' ')[-1]
 

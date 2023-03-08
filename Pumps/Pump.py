@@ -1,3 +1,4 @@
+import serial
 class Pump:
     """
 
@@ -24,7 +25,7 @@ class Pump:
 
     def flow(self,volume):
         """ OVERWRITE"""
-        
+
         
 
 

@@ -1,16 +1,40 @@
 
-class Fluidics:
+import socket
+import serial
+
+class Fluidics(object):
     def __init__(self):
         self.Protocols = Protocols
         self.Pump = Pump
         self.Valve = Valve
+        self.HOST = '127.0.0.1'
+        self.PORT = 9500
+        self.Valve_Commands = {}
+        # self.socket = socket.socket('127.0.0.1',9500)
 
     def notify_user(self,message):
         if self.verbose:
             print(message)
 
+    # def listen(self):
+    #     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    #         s.bind((self.HOST, self.PORT))
+    #         s.listen()
+    #         print(f"Server is listening on {self.HOST}:{self.PORT}")
+    #         while True:
+    #             conn, addr = s.accept()
+    #             with conn:
+    #                 print(f"Connected by {addr}")
+    #                 # Receive data from the client
+    #                 data = conn.recv(1024)
+    #                 if data:
+    #                     message = data.decode()
+    #                     # Interpret Message and execute protocol
+    #                 # Send a response back to the client
+    #                 conn.sendall(b"Available")
+
     def execute_protocol(self,protocol,chambers,other):
-        steps = self.Protocols.get_steps(protocol,chambers,other):
+        steps = self.Protocols.get_steps(protocol,chambers,other)
         if not isinstance(steps,pd.DataFrame):
             self.notify_user('Unknown Protocol: ',protocol)
         else:
@@ -47,5 +71,18 @@ class Fluidics:
                 time.sleep(t/10)
                 if t>0:
                     self.notify_user('          '+str(round((i+1)*10))+'% Complete')
+
+
+"""
+
+flow = Fluidics(); 
+flow.socket = tcpip('127.0.0.1', 9500);
+
+
+tcpServer = TCPServer(port = 9500,
+                        server_name = "Fluidics",
+                        verbose = True)
+
+"""
 
     

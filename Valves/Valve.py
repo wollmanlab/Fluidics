@@ -1,3 +1,4 @@
+import serial
 class Valve:
     """
 
@@ -11,7 +12,7 @@ class Valve:
 
     def set_port(self,valve,port):
         self.current_port[valve] = port
-        
+
     def get_port(self,valve):
         return self.current_port[valve]
 
