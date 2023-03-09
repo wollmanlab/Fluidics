@@ -7,9 +7,10 @@ from Valves.ViciValve import ViciValve as Valve
 
 class RamboFluidics(Fluidics):
     def __init__(self,verbose):
+        super().__init__()
         self.Protocol = Protocol(verbose)
-        # self.Pump = Pump('COM6')
-        # self.Valve = Valve('COM1')
+        self.Pump = Pump('COM11')
+        self.Valve = Valve('COM1')
         hybe_valve = 3
         chamber_valve = 1
         self.Valve_Commands = {

@@ -1,4 +1,5 @@
 from Protocols.Protocol import *
+import pandas as pd
 class SyringeProtocol(Protocol):
     def __init__(self,verbose):
         self.verbose = True
@@ -16,22 +17,22 @@ class SyringeProtocol(Protocol):
         """ EMPTY CHAMBER """
         for chamber in chambers:
             steps.append(self.replace_volume(port,chamber,volume))
-        return pd.concat(steps,ignore_index=true)
+        return pd.concat(steps,ignore_index=True)
 
     def replace_volume(self,inport,outport,volume,speed=0,pause=0):
         steps = []
         steps.append(self.empty_chamber(outport))
         steps.append(self.add_liquid(inport,outport,volume))
-        return pd.concat(steps,ignore_index=true)
+        return pd.concat(steps,ignore_index=True)
 
-    def empty_chamber(chamber,speed=0,pause=0):
+    def empty_chamber(self,chamber,speed=0,pause=0):
         steps = []
         steps.append(self.format(port=chamber,volume=5,speed=speed,pause=pause,direction='Reverse'))
         steps.append(self.format(port='Waste',volume=5,speed=speed,pause=pause,direction='Forward'))
-        return pd.concat(steps,ignore_index=true)
+        return pd.concat(steps,ignore_index=True)
 
-    def add_liquid(port,chamber,volume,speed=0,pause=0):
+    def add_liquid(self,port,chamber,volume,speed=0,pause=0):
         steps = []
         steps.append(self.format(port=port,volume=volume,speed=speed,pause=pause,direction='Reverse'))
         steps.append(self.format(port=chamber,volume=volume,speed=speed,pause=pause,direction='Forward'))
-        return pd.concat(steps,ignore_index=true)
+        return pd.concat(steps,ignore_index=True)

@@ -2,6 +2,8 @@ import tkinter as tk
 from tkinter import ttk
 import threading
 from RamboFluidics import RamboFluidics as Fluidics
+import socket
+from fileu import update_user
 
 class GUI(tk.Frame):
     def __init__(self, master=None):
@@ -13,10 +15,16 @@ class GUI(tk.Frame):
 
         self.Fluidics = Fluidics(True)
         self.ports = [i for i in self.Fluidics.Valve_Commands.keys()]
-        # self.ports = ["Port 1", "Port 2", "Port 3"]
-        self.protocols = [i for i in self.Fluidics.Protocol.protocols.keys()]#['Hybe','Strip','Image','Clear','Valve','Flush','Valve']
+        self.protocols = [i for i in self.Fluidics.Protocol.protocols.keys()]
         self.chambers = [i for i in self.Fluidics.Valve_Commands.keys() if len(i)==1]
         self.other = ""
+        self.other = "TBS+3"
+
+        self.ports.insert(0,"")
+        self.protocols.insert(0,"")
+
+        self.ports.insert(0,"")
+        self.protocols.insert(0,"")
 
         self.running = False
         self.flow_thread = None
@@ -31,6 +39,10 @@ class GUI(tk.Frame):
         self.style.configure("TCheckbutton", foreground="white", background="gray30")
         self.style.configure("TEntry", foreground="white", background="gray30")
         self.style.configure("TButton", foreground="white", background="gray20", activebackground="gray40")
+        
+    def notify_user(self,message,level=20):
+        if self.verbose:
+            update_user(message,level=level,logger=None)
 
 
     def create_widgets(self):
@@ -75,6 +87,23 @@ class GUI(tk.Frame):
         self.running_label = ttk.Label(self, text="")
         self.running_label.grid(row=6, column=2, columnspan=2)
 
+    def listen(self):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.bind((self.HOST, self.PORT))
+            s.listen()
+            print(f"Server is listening on {self.HOST}:{self.PORT}")
+            while True:
+                self.conn, addr = s.accept()
+                with self.conn:
+                    print(f"Connected by {addr}")
+                    # Receive data from the client
+                    data = self.conn.recv(1024)
+                    if data:
+                        message = data.decode()
+                        self.execute_message(message)
+                    # Send a response back to the client
+                    self.conn.sendall(b"Available")
+
     def toggle_flow(self):
         # Start the flow function
         self.running = True
@@ -99,22 +128,28 @@ class GUI(tk.Frame):
 
         print(f"Protocol: {self.port_var.get()}")
 
-    def flow(self):
-        # Simulate a long-running task
-        import time
-
-        print(f"Protocol: {self.protocol}")
-        print(f"Chambers: {self.chamber}")
-        print(f"Other: {self.other}")
-
-        self.running_label.config(text=self.protocol+'_'+''.join(self.chamber)+'_'+self.other)
-        time.sleep(5)
-        self.running = False
-        self.flow_thread = None
-
+    def execute_message(self,message):
+        print(message)
+        # Interpret Message and execute protocol
+        self.start_button.config(text="Running")
+        try:
+            self.conn.sendall(b"Busy")
+        except:
+            print('No Socket Connection')
+        self.running_label.config(text=message)
+        protocol,chambers,other = self.Fluidics.read_message(message)
+        self.Fluidics.execute_protocol(protocol,chambers,other)
         # Reset the start/stop button and running label
         self.start_button.config(text="Start")
         self.running_label.config(text="")
+        try:
+            self.conn.sendall(b"Available")
+        except:
+            print('No Socket Connection')
+
+    def flow(self):
+        message =self.protocol+'_'+''.join(self.chamber)+'_'+self.other
+        self.execute_message(message)
 
 if __name__ == '__main__':
     root = tk.Tk()

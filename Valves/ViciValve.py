@@ -1,4 +1,5 @@
 from Valves.Valve import *
+import time
 class ViciValve(Valve):
     """
 
@@ -12,14 +13,20 @@ class ViciValve(Valve):
                                     parity = serial.PARITY_NONE, 
                                     stopbits = serial.STOPBITS_ONE, 
                                     timeout = 0.1)
+        self.acknowledge = " ID = "
+        self.carriage_return = bytes("\r", 'utf-8')
         self.negative_acknowledge = ""
+        self.read_length = 64
+        self.char_offset = 97
 
     def notify_user(self,message):
         if self.verbose:
             print(message)
 
     def set_port(self, valve_ID, port_ID):
-        message = valve_ID + "GO" + str(port_ID+1) + "\r"
+        valve_ID = str(valve_ID)
+        port_ID = str(int(port_ID)+1)
+        message = valve_ID + "GO" + port_ID + "\r"
         self.write(message)
         time.sleep(1)
         self.current_port[valve_ID] = self.get_port(valve_ID)
@@ -32,11 +39,21 @@ class ViciValve(Valve):
         if response[1]:
             return response[3].split(' ')[-1]
 
+    def read(self):
+        response = self.serial.read(self.read_length).split(self.carriage_return)[0]
+        # if self.verbose:
+            # print "Received: " + str((response, ""))
+        return response
+
+    def write(self, message):
+        message = bytes(message, 'utf-8')
+        self.serial.write(message)
+
 
     def inquireAndRespond(self, valve_ID, message, dictionary = {}, default = "Unknown"):
         # Write message and read response
         self.write(valve_ID + message)
-        response = self.read()
+        response = str(self.read())
         if len(response)>0:
             # Strip off valve id
             response = response[2:]

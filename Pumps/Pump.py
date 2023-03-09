@@ -1,16 +1,19 @@
 import serial
+import time
+from fileu import update_user
 class Pump:
     """
 
     """
     def __init__(self):
+        self.verbose=True
         self.direction = 'Forward'
         self.volume = 0
         self.speed = 0
 
-    def notify_user(self,message):
+    def notify_user(self,message,level=20):
         if self.verbose:
-            print(message)
+            update_user(message,level=level,logger=None)
 
     def start_flow(self,volume,direction,speed):
         self.set_direction(direction)

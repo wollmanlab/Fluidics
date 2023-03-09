@@ -46,11 +46,32 @@ class SyringePump(Pump):
             pin_ = pin
         cmd_str = self.build_cmd_str("dw", (pin_,))
         try:
-            print('         '+cmd_str)
+            print('         '+str(cmd_str))
             self.serial.write(cmd_str)
             self.serial.flush()
-        except:
+        except Exception as e:
+            print(e)
             print('Failed to set pin.')
+            pass
+
+    def pinMode(self, pin, val):
+        """
+        Sets I/O mode of pin
+        inputs:
+           pin: pin number to toggle
+           val: "INPUT" or "OUTPUT"
+        """
+        if val == "INPUT":
+            pin_ = -pin
+        else:
+            pin_ = pin
+        cmd_str = self.build_cmd_str("pm", (pin_,))
+        try:
+            self.serial.write(cmd_str)
+            self.serial.flush()
+        except Exception as e:
+            print(e)
+            print('SETUP Failed.')
             pass
 
     def build_cmd_str(self,cmd, args=None):
@@ -66,7 +87,9 @@ class SyringePump(Pump):
             args = '%'.join(map(str, args))
         else:
             args = ''
-        return "@{cmd}%{args}$!".format(cmd=cmd, args=args)
+
+        message = "@{cmd}%{args}$!".format(cmd=cmd, args=args)
+        return bytes(message, 'utf-8')
 
         
 

@@ -1,40 +1,33 @@
-
-import socket
 import serial
+import time
+import pandas as pd
+import numpy as np
+from fileu import update_user
+from Pumps.SyringePump import Pump as Pump
+from Protocols.SyringeProtocol import Protocol as Protocol
+from Valves.ViciValve import Valve as Valve
 
 class Fluidics(object):
     def __init__(self):
-        self.Protocols = Protocols
+        self.verbose=True
+        self.Protocol = Protocol
         self.Pump = Pump
         self.Valve = Valve
         self.HOST = '127.0.0.1'
         self.PORT = 9500
         self.Valve_Commands = {}
-        # self.socket = socket.socket('127.0.0.1',9500)
 
-    def notify_user(self,message):
+    def notify_user(self,message,level=20):
         if self.verbose:
-            print(message)
+            update_user(message,level=level,logger=None)
 
-    # def listen(self):
-    #     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    #         s.bind((self.HOST, self.PORT))
-    #         s.listen()
-    #         print(f"Server is listening on {self.HOST}:{self.PORT}")
-    #         while True:
-    #             conn, addr = s.accept()
-    #             with conn:
-    #                 print(f"Connected by {addr}")
-    #                 # Receive data from the client
-    #                 data = conn.recv(1024)
-    #                 if data:
-    #                     message = data.decode()
-    #                     # Interpret Message and execute protocol
-    #                 # Send a response back to the client
-    #                 conn.sendall(b"Available")
+    def read_message(self,message):
+        protocol,chambers,other = message.split('_')
+        chambers = chambers[1:-1].split(',')
+        return protocol,chambers,other
 
     def execute_protocol(self,protocol,chambers,other):
-        steps = self.Protocols.get_steps(protocol,chambers,other)
+        steps = self.Protocol.get_steps(protocol,chambers,other)
         if not isinstance(steps,pd.DataFrame):
             self.notify_user('Unknown Protocol: ',protocol)
         else:
@@ -53,12 +46,10 @@ class Fluidics(object):
             self.notify_user('          Tube: '+command)
             """ Set Port """
             self.Valve.set_port(int(self.Valve_Commands[command]['valve'])-1, int(self.Valve_Commands[command]['port'])-1)
-            time.sleep(1)
             command = 'Valve'+str(self.Valve_Commands[command]['valve'])
             while command in self.Valve_Commands.keys():
                 self.Valve.set_port(int(self.Valve_Commands[command]['valve'])-1, int(self.Valve_Commands[command]['port'])-1)
                 command = 'Valve'+str(self.Valve_Commands[command]['valve'])
-                time.sleep(1)
 
     def start_flow(self,volume,direction,speed):
         if volume>0:
