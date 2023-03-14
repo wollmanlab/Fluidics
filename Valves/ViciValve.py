@@ -19,7 +19,7 @@ class ViciValve(Valve):
         self.read_length = 64
         self.char_offset = 97
 
-    def notify_user(self,message):
+    def update_user(self,message):
         if self.verbose:
             print(message)
 

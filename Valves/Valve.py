@@ -9,7 +9,7 @@ class Valve:
         self.verbose=True
         self.current_port = {}
 
-    def notify_user(self,message,level=20):
+    def update_user(self,message,level=20):
         if self.verbose:
             update_user(message,level=level,logger=None)
 

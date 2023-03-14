@@ -8,7 +8,7 @@ class SyringePump(Pump):
         self.com_port = com_port
         self.serial = serial.Serial(com_port, 9600, timeout=2)
 
-    def notify_user(self,message):
+    def update_user(self,message):
         if self.verbose:
             print(message)
 
@@ -18,7 +18,7 @@ class SyringePump(Pump):
         elif self.direction=='Forward':
             pin = self.forward
         else:
-            self.notify_user('Unknown Direction: ',self.direction)
+            self.update_user('Unknown Direction: ',self.direction)
             pin = 13 # LED PIN
         self.pinMode(pin,"OUTPUT")
         self.digitalWrite(pin,'HIGH')
