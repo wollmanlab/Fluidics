@@ -45,7 +45,7 @@ class GUI(tk.Frame):
         self.style.configure("TEntry", foreground="white", background="gray30")
         self.style.configure("TButton", foreground="white", background="gray20", activebackground="gray40")
 
-        self.update_log('')
+        self.update_log('Available')
 
         self.thread = threading.Thread(target=self.listen)
         self.thread.daemon = True # without the daemon parameter, the function in parallel will continue even your main program ends
