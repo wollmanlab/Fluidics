@@ -7,6 +7,7 @@ from Pumps.SyringePump import Pump as Pump
 from Protocols.SyringeProtocol import Protocol as Protocol
 from Valves.ViciValve import Valve as Valve
 
+
 class Fluidics(object):
     def __init__(self):
         self.verbose=True
@@ -17,7 +18,7 @@ class Fluidics(object):
         self.PORT = 9500
         self.Valve_Commands = {}
 
-    def notify_user(self,message,level=20):
+    def update_user(self,message,level=20):
         if self.verbose:
             update_user(message,level=level,logger=None)
 
@@ -29,7 +30,7 @@ class Fluidics(object):
     def execute_protocol(self,protocol,chambers,other):
         steps = self.Protocol.get_steps(protocol,chambers,other)
         if not isinstance(steps,pd.DataFrame):
-            self.notify_user('Unknown Protocol: ',protocol)
+            self.update_user('Unknown Protocol: ',protocol)
         else:
             for idx,step in steps.iterrows():
                 self.flow(step.port,step.volume,step.speed,step.pause,step.direction)
@@ -41,9 +42,9 @@ class Fluidics(object):
 
     def set_port(self,command):
         if not command in self.Valve_Commands.keys():
-            self.notify_user('          Unknown Tube: '+command)
+            self.update_user('          Unknown Tube: '+command)
         else:
-            self.notify_user('          Tube: '+command)
+            self.update_user('          Tube: '+command)
             """ Set Port """
             self.Valve.set_port(int(self.Valve_Commands[command]['valve'])-1, int(self.Valve_Commands[command]['port'])-1)
             command = 'Valve'+str(self.Valve_Commands[command]['valve'])
@@ -57,11 +58,11 @@ class Fluidics(object):
 
     def sleep(self,t):
         if t>0:
-            self.notify_user('          Wait '+str(round(t))+'s')
+            self.update_user('          Wait '+str(round(t))+'s')
             for i in range(10):
                 time.sleep(t/10)
                 if t>0:
-                    self.notify_user('          '+str(round((i+1)*10))+'% Complete')
+                    self.update_user('          '+str(round((i+1)*10))+'% Complete')
 
 
 """

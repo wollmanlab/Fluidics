@@ -26,6 +26,7 @@ class SyringePump(Pump):
         print('     Waiting '+str(int(flow_time))+'s for pump')
         time.sleep(flow_time)
         self.digitalWrite(pin,'LOW')
+        time.sleep(flow_time/10)
 
     def calcualte_flow_time(self,volume):
         flow_time = volume
@@ -46,7 +47,7 @@ class SyringePump(Pump):
             pin_ = pin
         cmd_str = self.build_cmd_str("dw", (pin_,))
         try:
-            print('         '+str(cmd_str))
+            # print('         '+str(cmd_str))
             self.serial.write(cmd_str)
             self.serial.flush()
         except Exception as e:

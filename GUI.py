@@ -4,10 +4,15 @@ import threading
 from RamboFluidics import RamboFluidics as Fluidics
 import socket
 from fileu import update_user
+import os
+import time
 
 class GUI(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
+        self.file_path = 'C:/GitRepos/Fluidics/Log.txt'
+        self.busy = False
+        self.verbose = True
         self.master = master
         self.master.geometry("300x200")
         self.master.title("Flow Control")
@@ -39,12 +44,38 @@ class GUI(tk.Frame):
         self.style.configure("TCheckbutton", foreground="white", background="gray30")
         self.style.configure("TEntry", foreground="white", background="gray30")
         self.style.configure("TButton", foreground="white", background="gray20", activebackground="gray40")
-        
-    def notify_user(self,message,level=20):
+
+        self.update_log('')
+
+        self.thread = threading.Thread(target=self.listen)
+        self.thread.daemon = True # without the daemon parameter, the function in parallel will continue even your main program ends
+        self.thread.start()
+
+    def update_user(self,message,level=20):
         if self.verbose:
-            update_user(message,level=level,logger=None)
+            self.Fluidics.update_user(message,level=level)
 
+    def update_log(self,message):
+        self.update_user(message)
+        with open(self.file_path,'w') as f:
+            f.write(message)
 
+    def listen(self):
+        if not self.busy:
+            if os.path.exists(self.file_path):
+                lines = ''
+                with open(self.file_path) as f:
+                    lines = f.readlines()
+                    if len(lines)>0:
+                        lines = lines[0]
+                if 'Command:' in lines:
+                    message = lines.split('Command:')[-1]
+                    self.Fluidics.update_user('Read:'+message)
+                    self.execute_message(message)
+            else:
+                self.update_log('Available')
+        root.after(1000, self.listen) # Every Second
+            
     def create_widgets(self):
         # Protocol dropdown
         self.protocol_label = ttk.Label(self, text="Protocol:")
@@ -87,22 +118,6 @@ class GUI(tk.Frame):
         self.running_label = ttk.Label(self, text="")
         self.running_label.grid(row=6, column=2, columnspan=2)
 
-    def listen(self):
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.bind((self.HOST, self.PORT))
-            s.listen()
-            print(f"Server is listening on {self.HOST}:{self.PORT}")
-            while True:
-                self.conn, addr = s.accept()
-                with self.conn:
-                    print(f"Connected by {addr}")
-                    # Receive data from the client
-                    data = self.conn.recv(1024)
-                    if data:
-                        message = data.decode()
-                        self.execute_message(message)
-                    # Send a response back to the client
-                    self.conn.sendall(b"Available")
 
     def toggle_flow(self):
         # Start the flow function
@@ -126,26 +141,19 @@ class GUI(tk.Frame):
         import time
         time.sleep(5)
 
-        print(f"Protocol: {self.port_var.get()}")
+        self.Fluidics.update_user(f"Protocol: {self.port_var.get()}")
 
     def execute_message(self,message):
-        print(message)
-        # Interpret Message and execute protocol
+        self.update_log('Running:'+message)
+        self.busy = True
         self.start_button.config(text="Running")
-        try:
-            self.conn.sendall(b"Busy")
-        except:
-            print('No Socket Connection')
         self.running_label.config(text=message)
         protocol,chambers,other = self.Fluidics.read_message(message)
         self.Fluidics.execute_protocol(protocol,chambers,other)
-        # Reset the start/stop button and running label
         self.start_button.config(text="Start")
         self.running_label.config(text="")
-        try:
-            self.conn.sendall(b"Available")
-        except:
-            print('No Socket Connection')
+        self.update_log('Finished:'+message)
+        self.busy = False
 
     def flow(self):
         message =self.protocol+'_'+''.join(self.chamber)+'_'+self.other
@@ -154,4 +162,5 @@ class GUI(tk.Frame):
 if __name__ == '__main__':
     root = tk.Tk()
     app = GUI(root)
+    root.after(1000, app.listen) # Every Second
     root.mainloop()
