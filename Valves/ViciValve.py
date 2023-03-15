@@ -5,6 +5,7 @@ class ViciValve(Valve):
 
     """
     def __init__(self,com_port):
+        super().__init__()
         self.com_port = com_port
         self.current_port = {}
         self.serial = serial.Serial(port = self.com_port, 
@@ -21,7 +22,7 @@ class ViciValve(Valve):
 
     def update_user(self,message):
         if self.verbose:
-            print(message)
+            update_user(message)
 
     def set_port(self, valve_ID, port_ID):
         valve_ID = str(valve_ID)
@@ -35,14 +36,14 @@ class ViciValve(Valve):
         message = "CP\r"
         response = self.inquireAndRespond(valve_ID, message)
         if response[0] == "Negative Acknowledge":
-            print("Move failed: " + str(response))
+            self.update_user("Move failed: " + str(response))
         if response[1]:
             return response[3].split(' ')[-1]
 
     def read(self):
         response = self.serial.read(self.read_length).split(self.carriage_return)[0]
         # if self.verbose:
-            # print "Received: " + str((response, ""))
+            # self.update_user "Received: " + str((response, ""))
         return response
 
     def write(self, message):

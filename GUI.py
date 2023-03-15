@@ -1,29 +1,38 @@
 import tkinter as tk
 from tkinter import ttk
 import threading
-from RamboFluidics import RamboFluidics as Fluidics
+# from RamboFluidics import RamboFluidics as Fluidics
 import socket
-from fileu import update_user
+from fileu import *
 import os
 import time
+import argparse
+import importlib
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-f", "--fluidics_class", type=str, dest="fluidics_class", default="Fluidics", action='store', help="Which Fluidics Class to use")
+    args = parser.parse_args()
 
 class GUI(tk.Frame):
-    def __init__(self, master=None):
+    def __init__(self, master=None,fluidics_class='Fluidics'):
         super().__init__(master)
         self.file_path = 'C:/GitRepos/Fluidics/Log.txt'
         self.busy = False
         self.verbose = True
         self.master = master
-        self.master.geometry("300x200")
+        self.master.geometry("400x400")
         self.master.title("Flow Control")
         self.grid()
 
+        module = importlib.import_module(fluidics_class)
+        Fluidics = getattr(module, fluidics_class)
         self.Fluidics = Fluidics(True)
         self.ports = [i for i in self.Fluidics.Valve_Commands.keys()]
         self.protocols = [i for i in self.Fluidics.Protocol.protocols.keys()]
         self.chambers = [i for i in self.Fluidics.Valve_Commands.keys() if len(i)==1]
         self.other = ""
-        self.other = "TBS+3"
+        self.volume = ""
 
         self.ports.insert(0,"")
         self.protocols.insert(0,"")
@@ -35,6 +44,10 @@ class GUI(tk.Frame):
         self.flow_thread = None
 
         self.create_widgets()
+
+        window_width = self.master.winfo_reqwidth()+100
+        window_height = self.master.winfo_reqheight()+100
+        self.master.geometry('{}x{}'.format(window_width, window_height))
 
         # Apply dark theme
         self.style = ttk.Style()
@@ -56,9 +69,13 @@ class GUI(tk.Frame):
             self.Fluidics.update_user(message,level=level)
 
     def update_log(self,message):
-        self.update_user(message)
-        with open(self.file_path,'w') as f:
-            f.write(message)
+        # self.update_user(message)
+        try:
+            with open(self.file_path,'w') as f:
+                f.write(message)
+        except:
+            with open(self.file_path.split(':')[-1],'w') as f:
+                f.write(message)
 
     def listen(self):
         if not self.busy:
@@ -84,40 +101,39 @@ class GUI(tk.Frame):
         self.protocol_dropdown = ttk.OptionMenu(self, self.protocol_var, *self.protocols)
         self.protocol_dropdown.grid(row=1, column=0)
 
+        # Port dropdown
+        self.port_label = ttk.Label(self, text="Ports:")
+        self.port_label.grid(row=2, column=0)
+        self.port_var = tk.StringVar(self)
+        self.port_dropdown = ttk.OptionMenu(self, self.port_var, *self.ports)
+        self.port_dropdown.grid(row=3, column=0)
+
+        # Volume text input
+        self.volume_label = ttk.Label(self, text="Volume:")
+        self.volume_label.grid(row=4, column=0)
+        self.volume_entry = ttk.Entry(self, foreground="black")
+        self.volume_entry.grid(row=5, column=0)
+
+        # Start/Stop button
+        self.start_button = ttk.Button(self, text="Start", command=self.toggle_flow)
+        self.start_button.grid(row=7, column=0)
+
+        # # Running label
+        self.running_label = ttk.Label(self, text="")
+        self.running_label.grid(row=8, column=0, columnspan=1)
+        
         # Chambers checklist
         self.chamber_label = ttk.Label(self, text="Chambers:")
-        self.chamber_label.grid(row=0, column=1)
+        self.chamber_label.grid(row=0, column=2)
         self.chamber_vars = []
         for i in range(len(self.chambers)):
             self.chamber_vars.append(tk.BooleanVar(self))
             self.chamber_vars[i].set(False)
-            ttk.Checkbutton(self, text=self.chambers[i], variable=self.chamber_vars[i]).grid(row=i+1, column=1)
+            ttk.Checkbutton(self, text=self.chambers[i], variable=self.chamber_vars[i]).grid(row=i+1, column=2)
 
-        # Other text input
-        self.other_label = ttk.Label(self, text="Other:")
-        self.other_label.grid(row=0, column=2)
-        self.other_entry = ttk.Entry(self, foreground="black")
-        self.other_entry.grid(row=1, column=2)
-
-        # Start/Stop button
-        self.start_button = ttk.Button(self, text="Start", command=self.toggle_flow)
-        self.start_button.grid(row=2, column=2, columnspan=2,rowspan=2)
-
-        # Port dropdown
-        self.port_label = ttk.Label(self, text="Ports:")
-        self.port_label.grid(row=3, column=0)
-        self.port_var = tk.StringVar(self)
-        self.port_dropdown = ttk.OptionMenu(self, self.port_var, *self.ports)
-        self.port_dropdown.grid(row=4, column=0)
-
-        # Start/Stop button
-        self.change_port_button = ttk.Button(self, text="Change Port", command=self.change_port)
-        self.change_port_button.grid(row=4, column=2, columnspan=2,rowspan=2)
-
-        # # Running label
-        self.running_label = ttk.Label(self, text="")
-        self.running_label.grid(row=6, column=2, columnspan=2)
-
+        # # Start/Stop button
+        # self.change_port_button = ttk.Button(self, text="Change Port", command=self.change_port)
+        # self.change_port_button.grid(row=4, column=3, columnspan=2,rowspan=2)
 
     def toggle_flow(self):
         # Start the flow function
@@ -130,17 +146,17 @@ class GUI(tk.Frame):
         # Get selected chambers
         self.chamber = '['+''.join([self.chambers[i]+',' for i in range(len(self.chambers)) if self.chamber_vars[i].get()])[:-1]+']'
 
+        # Get port text input
+        self.port = self.port_var.get()
+
         # Get other text input
-        self.other = self.other_entry.get()
+        self.volume = self.volume_entry.get()
 
         # Execute flow function in a separate thread
         self.flow_thread = threading.Thread(target=self.flow)
         self.flow_thread.start()
 
     def change_port(self):
-        import time
-        time.sleep(5)
-
         self.Fluidics.update_user(f"Protocol: {self.port_var.get()}")
 
     def execute_message(self,message):
@@ -156,11 +172,16 @@ class GUI(tk.Frame):
         self.busy = False
 
     def flow(self):
-        message =self.protocol+'_'+''.join(self.chamber)+'_'+self.other
+        if self.protocol == 'Valve':
+            message =self.protocol+'_'+''.join(self.chamber)+'_'+self.port + '+' + str(self.volume)
+        else:
+            message =self.protocol+'_'+''.join(self.chamber)+'_'+self.port
         self.execute_message(message)
 
 if __name__ == '__main__':
+
+    fluidics_class = args.fluidics_class
     root = tk.Tk()
-    app = GUI(root)
+    app = GUI(root,fluidics_class=fluidics_class)
     root.after(1000, app.listen) # Every Second
     root.mainloop()

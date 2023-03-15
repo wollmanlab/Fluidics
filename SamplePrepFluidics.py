@@ -6,27 +6,24 @@ from Protocols.SyringeProtocol import SyringeProtocol as Protocol
 from Valves.ViciValve import ViciValve as Valve
 
 
-class RamboFluidics(Fluidics):
+class SamplePrepFluidics(Fluidics):
     def __init__(self, verbose):
         super().__init__()  # call __init__ method of the super class
         self.verbose = verbose
         self.Protocol = Protocol(verbose)
-        self.Pump = Pump('COM11')
-        self.Valve = Valve('COM1')
-        hybe_valve = 2
+        self.Pump = Pump('/dev/ttyACM0')
+        self.Valve = Valve('/dev/ttyUSB0')
         chamber_valve = 1
         self.Valve_Commands = {
-                                'Valve2':{'valve':1,'port':16},
-                                'Waste':{'valve':1,'port':15},
+                                'Waste':{'valve':1,'port':13},
                                 'TBS':{'valve':1,'port':14},
-                                'WBuffer':{'valve':1,'port':13},
-                                'TCEP':{'valve':1,'port':12},
-                                'Hybe25':{'valve':1,'port':11},
+                                'Urea':{'valve':1,'port':15},
+                                'SDS':{'valve':1,'port':16},
+                                'TCEP':{'valve':1,'port':23},
+                                'ProtK':{'valve':1,'port':24},
                             }
-        for i in range(1,25):
-            self.Valve_Commands['Hybe'+str(i)] = {'valve':hybe_valve,'port':i}
-            
-        for i in range(6):
+        for i in range(4):
                 self.Valve_Commands[chr(ord('A') + i)] = {'valve':chamber_valve,'port':i+1}
+
 
     

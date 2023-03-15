@@ -2,7 +2,7 @@ import serial
 import time
 import pandas as pd
 import numpy as np
-from fileu import update_user
+from fileu import *
 from Pumps.SyringePump import Pump as Pump
 from Protocols.SyringeProtocol import Protocol as Protocol
 from Valves.ViciValve import Valve as Valve
@@ -33,6 +33,7 @@ class Fluidics(object):
             self.update_user('Unknown Protocol: ',protocol)
         else:
             for idx,step in steps.iterrows():
+                self.update_user(pd.DataFrame(step).T)
                 self.flow(step.port,step.volume,step.speed,step.pause,step.direction)
 
     def flow(self,port,volume,speed,pause,direction):
@@ -44,7 +45,7 @@ class Fluidics(object):
         if not command in self.Valve_Commands.keys():
             self.update_user('          Unknown Tube: '+command)
         else:
-            self.update_user('          Tube: '+command)
+            # self.update_user('          Tube: '+command)
             """ Set Port """
             self.Valve.set_port(int(self.Valve_Commands[command]['valve'])-1, int(self.Valve_Commands[command]['port'])-1)
             command = 'Valve'+str(self.Valve_Commands[command]['valve'])
