@@ -3,28 +3,94 @@ import time
 import pandas as pd
 import numpy as np
 from fileu import *
-from Pumps.SyringePump import Pump as Pump
-from Protocols.SyringeProtocol import Protocol as Protocol
+from Pumps.Pump import Pump as Pump
+from Protocols.Protocol import Protocol as Protocol
 from Valves.ViciValve import Valve as Valve
+import argparse
+import importlib
+import threading
+import sys
+import os
+
+dir = os.path.dirname(os.path.abspath(__file__))
+for file in os.listdir(dir):
+    if os.path.isdir(os.path.join(dir,file)):
+        sys.path.append(os.path.join(dir,file))
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-f", "--fluidics_class", type=str, dest="fluidics_class", default="Fluidics", action='store', help="Which Fluidics Class to use")
+    args = parser.parse_args()
+
 
 
 class Fluidics(object):
-    def __init__(self):
+    def __init__(self,gui=False):
         self.verbose=True
-        self.Protocol = Protocol
-        self.Pump = Pump
-        self.Valve = Valve
-        self.HOST = '127.0.0.1'
-        self.PORT = 9500
+        # self.Protocol = Protocol(gui=gui)
+        # self.Pump = Pump(gui=gui)
+        # self.Valve = Valve(gui=gui)
+        self.file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),'Log.txt')
+        self.last_message = ""
         self.Valve_Commands = {}
+        self.busy=False
+
+        # self.thread = threading.Thread(target=self.run)
+        # self.thread.daemon = True # without the daemon parameter, the function in parallel will continue even your main program ends
+        # self.thread.start()
+        self.update_communication('Available')
 
     def update_user(self,message,level=20):
         if self.verbose:
             update_user(message,level=level,logger=None)
 
-    def read_message(self,message):
+    def run(self):
+        if not self.busy:
+            # Read Communication
+            current_message = self.read_communication()
+            if self.last_message!=current_message:
+                self.last_message = current_message
+                print(current_message)
+            if 'Command' in current_message:
+                print(current_message)
+                self.busy = True
+                # interpret message
+                message = current_message.split(':')[-1]
+                self.update_communication('Running:'+message)
+                protocol,chambers,other = self.interpret_message(message)
+                self.execute_protocol(protocol,chambers,other)
+                self.update_communication('Finished:'+message)
+                self.busy = False
+        precise_sleep(1)
+
+    def read_communication(self):
+        try:
+            with open(self.file_path,'r') as f:
+                message = f.read()
+        except:
+            with open(self.file_path.split(':')[-1],'r') as f:
+                message = f.read()
+        if self.last_message !=message:
+            self.last_message = message
+            self.update_user(message)
+        return message
+
+    def update_communication(self,message):
+        self.update_user(message)
+        try:
+            with open(self.file_path,'w') as f:
+                f.write(message)
+        except:
+            with open(self.file_path.split(':')[-1],'w') as f:
+                f.write(message)
+
+    def interpret_message(self,message):
         protocol,chambers,other = message.split('_')
         chambers = chambers[1:-1].split(',')
+        if 'Flush' in protocol:
+            chambers = self.Valve_Commands
+        if 'Prime' in protocol:
+            chambers = self.Valve_Commands
         return protocol,chambers,other
 
     def execute_protocol(self,protocol,chambers,other):
@@ -34,7 +100,10 @@ class Fluidics(object):
         else:
             for idx,step in steps.iterrows():
                 self.update_user(pd.DataFrame(step).T)
-                self.flow(step.port,step.volume,step.speed,step.pause,step.direction)
+                if step.direction == 'Wait':
+                    precise_sleep(step.pause)
+                else:
+                    self.flow(step.port,step.volume,step.speed,step.pause,step.direction)
 
     def flow(self,port,volume,speed,pause,direction):
         self.set_port(port)
@@ -65,17 +134,13 @@ class Fluidics(object):
                 if t>0:
                     self.update_user('          '+str(round((i+1)*10))+'% Complete')
 
+if __name__ == '__main__':
+    fluidics_class = args.fluidics_class
+    module = importlib.import_module(fluidics_class)
+    Fluidics_Class = getattr(module, fluidics_class)
+    self = Fluidics_Class(gui=False)
+    while True:
+        self.run()
 
-"""
-
-flow = Fluidics(); 
-flow.socket = tcpip('127.0.0.1', 9500);
-
-
-tcpServer = TCPServer(port = 9500,
-                        server_name = "Fluidics",
-                        verbose = True)
-
-"""
 
     

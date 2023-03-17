@@ -4,11 +4,13 @@ class ViciValve(Valve):
     """
 
     """
-    def __init__(self,com_port):
+    def __init__(self,com_port,gui=False):
         super().__init__()
         self.com_port = com_port
         self.current_port = {}
-        self.serial = serial.Serial(port = self.com_port, 
+        
+        if not gui:
+            self.serial = serial.Serial(port = self.com_port, 
                                     baudrate = 9600, 
                                     bytesize = serial.EIGHTBITS, #8 bits
                                     parity = serial.PARITY_NONE, 

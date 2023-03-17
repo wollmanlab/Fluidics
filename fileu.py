@@ -13,7 +13,7 @@ for handler in logging.root.handlers[:]:
     logging.root.removeHandler(handler)
 
 logging.basicConfig(
-                    filename=os.path.join(os.path.dirname(os.path.abspath(__file__)),time_stamp+'.log'),filemode='a',
+                    filename=os.path.join(os.path.dirname(os.path.abspath(__file__)),'Logs',time_stamp+'.log'),filemode='a',
                     format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
                     datefmt='%H:%M:%S',level=20)
 

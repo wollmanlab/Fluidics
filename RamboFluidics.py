@@ -7,12 +7,12 @@ from Valves.ViciValve import ViciValve as Valve
 
 
 class RamboFluidics(Fluidics):
-    def __init__(self, verbose):
+    def __init__(self,gui=False):
         super().__init__()  # call __init__ method of the super class
-        self.verbose = verbose
-        self.Protocol = Protocol(verbose)
-        self.Pump = Pump('COM11')
-        self.Valve = Valve('COM1')
+        self.verbose = True
+        self.Protocol = Protocol(gui=gui)
+        self.Pump = Pump('COM11',gui=gui)
+        self.Valve = Valve('COM1',gui=gui)
         hybe_valve = 2
         chamber_valve = 1
         self.Valve_Commands = {

@@ -5,7 +5,7 @@ class Pump:
     """
 
     """
-    def __init__(self):
+    def __init__(self,gui=False):
         self.verbose=True
         self.direction = 'Forward'
         self.volume = 0

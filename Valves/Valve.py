@@ -5,7 +5,7 @@ class Valve:
     """
 
     """
-    def __init__(self):
+    def __init__(self,gui=False):
         self.verbose=True
         self.current_port = {}
 

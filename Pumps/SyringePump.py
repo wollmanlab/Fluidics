@@ -2,13 +2,14 @@ from Pumps.Pump import *
 class SyringePump(Pump):
     """
     """
-    def __init__(self,com_port,forward=5,reverse=4):
+    def __init__(self,com_port,forward=5,reverse=4,gui=False):
         super().__init__()
         self.forward = 5
         self.reverse = 4
         self.com_port = com_port
         self.speed_conversion = 1.5 # mL/s
-        self.serial = serial.Serial(com_port, 9600, timeout=2)
+        if not gui:
+            self.serial = serial.Serial(com_port, 9600, timeout=2)
 
     def update_user(self,message):
         if self.verbose:
@@ -25,11 +26,9 @@ class SyringePump(Pump):
         self.pinMode(pin,"OUTPUT")
         self.digitalWrite(pin,'HIGH')
         flow_time = self.calcualte_flow_time(volume)
-        # self.update_user(f"     Waiting {flow_time:.2f}s for pump")
-        # self.update_user(f"     Flowing {volume:.2f}mL")
         precise_sleep(flow_time)
         self.digitalWrite(pin,'LOW')
-        precise_sleep(flow_time/10)
+        precise_sleep(flow_time)
 
     def calcualte_flow_time(self,volume):
         flow_time = float(volume)*float(self.speed_conversion)
