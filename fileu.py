@@ -12,8 +12,11 @@ time_stamp = str(year)+str(month)+str(day)
 for handler in logging.root.handlers[:]:
     logging.root.removeHandler(handler)
 
+log_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),'Logs')
+if not os.path.exists(log_path):
+    os.mkdir(log_path)
 logging.basicConfig(
-                    filename=os.path.join(os.path.dirname(os.path.abspath(__file__)),'Logs',time_stamp+'.log'),filemode='a',
+                    filename=os.path.join(log_path,time_stamp+'.log'),filemode='a',
                     format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
                     datefmt='%H:%M:%S',level=20)
 

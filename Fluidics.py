@@ -30,7 +30,8 @@ class Fluidics(object):
         # self.Protocol = Protocol(gui=gui)
         # self.Pump = Pump(gui=gui)
         # self.Valve = Valve(gui=gui)
-        self.file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),'Log.txt')
+        self.file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),'Status.txt')
+        print(self.file_path)
         self.last_message = ""
         self.Valve_Commands = {}
         self.busy=False
@@ -64,12 +65,8 @@ class Fluidics(object):
         precise_sleep(1)
 
     def read_communication(self):
-        try:
-            with open(self.file_path,'r') as f:
-                message = f.read()
-        except:
-            with open(self.file_path.split(':')[-1],'r') as f:
-                message = f.read()
+        with open(self.file_path,'r') as f:
+            message = f.read()
         if self.last_message !=message:
             self.last_message = message
             self.update_user(message)
@@ -77,15 +74,11 @@ class Fluidics(object):
 
     def update_communication(self,message):
         self.update_user(message)
-        try:
-            with open(self.file_path,'w') as f:
-                f.write(message)
-        except:
-            with open(self.file_path.split(':')[-1],'w') as f:
+        with open(self.file_path,'w') as f:
                 f.write(message)
 
     def interpret_message(self,message):
-        protocol,chambers,other = message.split('_')
+        protocol,chambers,other = message.split('*')
         chambers = chambers[1:-1].split(',')
         if 'Flush' in protocol:
             chambers = self.Valve_Commands
