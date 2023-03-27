@@ -13,7 +13,18 @@ class RamboFluidics(Fluidics):
         self.Protocol = Protocol(gui=gui)
         self.Pump = Pump('COM15',gui=gui)
         self.Valve = Valve('COM16',gui=gui)
-        self.Valve_Commands = {
+        self.Pump.wait_factor = 1/2
+        self.Pump.speed_conversion = 1.5
+        self.Protocol.speed = 1
+        self.Protocol.closed_speed = 0.25
+        self.Protocol.wait_factor = self.Pump.wait_factor
+        self.Protocol.speed_conversion = self.Pump.speed_conversion
+
+
+        self.Valve_Commands = {'TBS':{'valve':2,'port':6},
+                                'IBuffer':{'valve':2,'port':9},
+                                'WBuffer':{'valve':2,'port':7},
+                                'TCEP':{'valve':2,'port':8},
                                 'Waste':{'valve':3,'port':10},
                                 'A':{'valve':3,'port':2},
                                 'B':{'valve':3,'port':3},
@@ -22,7 +33,6 @@ class RamboFluidics(Fluidics):
                                 'E':{'valve':3,'port':6},
                                 'F':{'valve':3,'port':7},
                                 'M':{'valve':3,'port':8},
-                                'Valve2':{'valve':3,'port':1},
                                 'Hybe1':{'valve':1,'port':1},
                                 'Hybe2':{'valve':1,'port':2},
                                 'Hybe3':{'valve':1,'port':3},
@@ -48,11 +58,8 @@ class RamboFluidics(Fluidics):
                                 'Hybe23':{'valve':1,'port':23},
                                 'Hybe24':{'valve':1,'port':24},
                                 'Hybe25':{'valve':2,'port':5},
-                                'TBS':{'valve':2,'port':6},
-                                'IBuffer':{'valve':2,'port':9},
-                                'WBuffer':{'valve':2,'port':7},
-                                'TCEP':{'valve':2,'port':8},
-                                'Valve1':{'valve':2,'port':10}
+                                'Valve1':{'valve':2,'port':10},
+                                'Valve2':{'valve':3,'port':1}
                             }
 
     

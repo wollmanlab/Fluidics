@@ -30,6 +30,7 @@ class GUI(tk.Frame):
         self.ports = [i for i in self.Fluidics.Valve_Commands.keys()]
         self.protocols = [i for i in self.Fluidics.Protocol.protocols.keys()]
         self.chambers = [i for i in self.Fluidics.Valve_Commands.keys() if len(i)==1]
+        self.chambers.append('Waste')
         self.other = ""
         self.extra = ""
 
@@ -41,11 +42,16 @@ class GUI(tk.Frame):
 
         self.running = False
         self.flow_thread = None
+
+        self.start_button_text = 'Start'
+        self.running_label_text = ""
+        self.update_label_text = ""
+        
         self.create_widgets()
 
     def update_user(self,message,level=20):
         if self.verbose:
-            self.Fluidics.update_user(message,level=level)
+            self.Fluidics.update_user(message,level=level,logger='GUI')
             
     def create_widgets(self):
         self.style = ttk.Style()
@@ -117,14 +123,14 @@ class GUI(tk.Frame):
         while True:
             if time.perf_counter()-start>1:
                 self.read_communication()
-            precise_sleep(0.05)
+            precise_sleep(0.1)
             self.master.update()
 
     def update_labels(self,labels_dict):
         self.update_labels_later()
 
     def update_labels_later(self):
-        self.update_user('update_labels')
+        # self.update_user('update_labels')
         labels_dict = self.labels()
         self.start_button.config(text=labels_dict['start_button_text'])
         self.running_label.config(text=labels_dict['running_label_text'])
@@ -154,6 +160,14 @@ class GUI(tk.Frame):
                 self.update_label_text = ""
                 self.update_labels(self.labels())
                 self.busy = False
+            elif ('Available' in current_message)|('Finished' in current_message):
+                self.start_button_text = 'Start'
+                self.running_label_text = ""
+                self.update_label_text = ""
+                self.update_labels(self.labels())
+                self.busy = False
+        self.master.update()
+        precise_sleep(1)
 
     def send_communication(self):
         # Get selected protocol

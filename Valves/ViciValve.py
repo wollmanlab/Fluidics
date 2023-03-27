@@ -22,10 +22,6 @@ class ViciValve(Valve):
         self.read_length = 64
         self.char_offset = 97
 
-    def update_user(self,message):
-        if self.verbose:
-            update_user(message)
-
     def set_port(self, valve_ID, port_ID):
         valve_ID = str(valve_ID)
         port_ID = str(int(port_ID)+1)

@@ -39,11 +39,12 @@ class Fluidics(object):
         # self.thread = threading.Thread(target=self.run)
         # self.thread.daemon = True # without the daemon parameter, the function in parallel will continue even your main program ends
         # self.thread.start()
-        self.update_communication('Available')
+        if not gui:
+            self.update_communication('Available')
 
-    def update_user(self,message,level=20):
+    def update_user(self,message,level=20,logger='Fluidics'):
         if self.verbose:
-            update_user(message,level=level,logger=None)
+            update_user(message,level=level,logger=logger)
 
     def run(self):
         if not self.busy:
@@ -62,7 +63,7 @@ class Fluidics(object):
                 self.execute_protocol(protocol,chambers,other)
                 self.update_communication('Finished:'+message)
                 self.busy = False
-        precise_sleep(1)
+        precise_sleep(5)
 
     def read_communication(self):
         with open(self.file_path,'r') as f:
@@ -89,7 +90,7 @@ class Fluidics(object):
     def execute_protocol(self,protocol,chambers,other):
         steps = self.Protocol.get_steps(protocol,chambers,other)
         if not isinstance(steps,pd.DataFrame):
-            self.update_user('Unknown Protocol: ',protocol)
+            self.update_user('Unknown Protocol: '+str(protocol))
         else:
             for idx,step in steps.iterrows():
                 self.update_user(pd.DataFrame(step).T)

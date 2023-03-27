@@ -1,5 +1,6 @@
 from Pumps.Pump import *
 from fractions import Fraction
+import numpy as np
 class SyringePump(Pump):
     """
     """
@@ -9,23 +10,20 @@ class SyringePump(Pump):
         self.reverse = 4
         self.com_port = com_port
         self.speed_conversion = 1.5 # mL/s
+        self.wait_factor = 1/3
         if not gui:
             self.serial = serial.Serial(com_port, 9600, timeout=2)
 
-    def update_user(self,message):
-        if self.verbose:
-            update_user(message)
-
     def flow(self,volume):
         speed = self.speed
-        print(speed)
+        # print(speed)
         # 25% increments
         speed = float(int(speed*4))/4
         if (speed<=0):
             speed = 0.05
         elif (speed>=1):
             speed = 1.0
-        print(speed)
+        # print(speed)
         if self.direction=='Reverse':
             pin = self.reverse
         elif self.direction=='Forward':
@@ -39,39 +37,65 @@ class SyringePump(Pump):
             self.digitalWrite(pin,'HIGH')
             precise_sleep(flow_time)
             self.digitalWrite(pin,'LOW')
-            precise_sleep(flow_time)
+            precise_sleep(flow_time*self.wait_factor) #wait for syringe to fill or empty
         else:
-            dt = 0.1 # frequency of pulses
-            tot_time_per_iter = 1
-            tot = int((tot_time_per_iter/dt)*1)
-            n_pos = int((tot_time_per_iter/dt)*speed)
-            n_neg = int((tot_time_per_iter/dt)*(1-speed))
-            # print(Fraction(n_pos,tot))
-            # n_neg = tot-n_pos
-            # n_pos,n_neg = Fraction(n_pos,n_neg)
-            completed_flow_time = 0
-            flow = True
-            iter = 0
-            while completed_flow_time<flow_time:
-                if (iter>(n_pos+n_neg))|(iter==0):
-                    # Reset Loop
-                    iter = 1
-                    flow = True
-                    self.digitalWrite(pin,'HIGH')
-                elif (iter>n_pos)&(flow==True):
-                    # Switch Flow to not Flow
-                    flow = False
-                    self.digitalWrite(pin,'LOW')
+            dt = 0.25
+            n_pos_steps = int(flow_time/dt)
+            n_steps = int((flow_time/dt)/speed)
+            steps = np.zeros(n_steps)
+            ratio = int(n_steps/n_pos_steps)
+            used_pos_steps = 0
+            for s in range(steps.shape[0]):
+                if s%ratio==0:
+                    if used_pos_steps<n_pos_steps:
+                        steps[s] = 1
+                        used_pos_steps+=1
+
+            # steps[0:int(flow_time/dt)] = 1
+            # np.random.shuffle(steps)
+            direction = -1
+            # print(steps)
+            for s in range(steps.shape[0]):
+                d = steps[s]
+                if d!=direction:
+                    direction = d
+                    # print('step',s,'direction',direction)
+                    if d==1:
+                        self.digitalWrite(pin,'HIGH')
+                    elif d==0:
+                        self.digitalWrite(pin,'LOW')
+                direction = d
                 precise_sleep(dt)
-                if flow:
-                    completed_flow_time+=dt
-                iter+=1
             self.digitalWrite(pin,'LOW')
-                
-                
 
-            
 
+
+            # dt = 0.25 # frequency of pulses
+            # tot_time_per_iter = 1
+            # tot = int((tot_time_per_iter/dt)*1)
+            # n_pos = int((tot_time_per_iter/dt)*speed)
+            # n_neg = int((tot_time_per_iter/dt)*(1-speed))
+            # # print(Fraction(n_pos,tot))
+            # # n_neg = tot-n_pos
+            # # n_pos,n_neg = Fraction(n_pos,n_neg)
+            # completed_flow_time = 0
+            # flow = True
+            # iter = 0
+            # while completed_flow_time<flow_time:
+            #     if (iter>(n_pos+n_neg))|(iter==0):
+            #         # Reset Loop
+            #         iter = 1
+            #         flow = True
+            #         self.digitalWrite(pin,'HIGH')
+            #     elif (iter>n_pos)&(flow==True):
+            #         # Switch Flow to not Flow
+            #         flow = False
+            #         self.digitalWrite(pin,'LOW')
+            #     precise_sleep(dt)
+            #     if flow:
+            #         completed_flow_time+=dt
+            #     iter+=1
+            # self.digitalWrite(pin,'LOW')
 
     def calcualte_flow_time(self,volume):
         flow_time = float(volume)*float(self.speed_conversion)

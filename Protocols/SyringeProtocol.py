@@ -16,13 +16,20 @@ class SyringeProtocol(Protocol):
         steps.append(self.wait(1))
         return pd.concat(steps,ignore_index=True)
 
-    def replace_volume_closed_single(self,inport,outport,volume,speed=0,pause=0):
+    def replace_volume_closed_single(self,inport,outport,volume,speed=0,pause=0,n_steps=1):
         if speed == 0:
             speed = self.speed
         steps = []
         steps.append(self.format(port=inport,volume=volume+self.closed_volume_buffer,speed=self.max_speed ,pause=0,direction='Reverse'))
         steps.append(self.wait(1))
-        steps.append(self.format(port=outport,volume=volume,speed=speed,pause=pause,direction='Forward'))
+        if n_steps==1:
+            steps.append(self.format(port=outport,volume=volume,speed=speed,pause=pause,direction='Forward'))
+        else:
+            n_steps = int(n_steps)
+            iter_volume = volume/n_steps
+            iter_pause = pause/n_steps
+            for s in range(n_steps):
+                steps.append(self.format(port=outport,volume=iter_volume,speed=speed,pause=iter_pause,direction='Forward'))
         steps.append(self.wait(1))
         steps.append(self.format(port='Waste',volume=self.closed_volume_buffer,speed=self.max_speed ,pause=0,direction='Forward'))
         steps.append(self.wait(1))

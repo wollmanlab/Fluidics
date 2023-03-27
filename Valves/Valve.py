@@ -9,9 +9,9 @@ class Valve:
         self.verbose=True
         self.current_port = {}
 
-    def update_user(self,message,level=20):
+    def update_user(self,message,level=20,logger='Valve'):
         if self.verbose:
-            update_user(message,level=level,logger=None)
+            update_user(message,level=level,logger=logger)
 
     def set_port(self,valve,port):
         self.current_port[valve] = port

@@ -11,9 +11,9 @@ class Pump:
         self.volume = 0
         self.speed = 0
 
-    def update_user(self,message,level=20):
+    def update_user(self,message,level=20,logger='Pump'):
         if self.verbose:
-            update_user(message,level=level,logger=None)
+            update_user(message,level=level,logger=logger)
 
     def start_flow(self,volume,direction,speed):
         self.set_direction(direction)
