@@ -180,4 +180,18 @@ class Protocol:
         steps.append(self.replace_volume_closed(chambers,'IBuffer',self.rinse_volume,speed=self.closed_speed,pause=self.rinse_time))
         return pd.concat(steps,ignore_index=True)
     
+ 
+    def formamide(self,chambers,port):
+        steps = []
+        steps.append(self.replace_volume(chambers,'FW',self.rinse_volume,speed=0,pause=60*15))
+        steps.append(self.replace_volume(chambers,'FW',self.rinse_volume,speed=0,pause=60*15))
+        steps.append(self.replace_volume(chambers,'FW',self.rinse_volume,speed=0,pause=60*15))
+        steps.append(self.replace_volume(chambers,'FW',self.rinse_volume,speed=0,pause=60*15))
+        return pd.concat(steps,ignore_index=True)
     
+    def TBSTw(self,chambers,port):
+        steps = []
+        steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=0,pause=60*5))
+        steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=0,pause=60*5))
+        steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=0,pause=60*5))
+        return pd.concat(steps,ignore_index=True)
