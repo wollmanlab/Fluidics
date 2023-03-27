@@ -14,7 +14,7 @@ class RamboFluidics(Fluidics):
         self.Pump = Pump('COM15',gui=gui)
         self.Valve = Valve('COM16',gui=gui)
         self.Pump.wait_factor = 1/2
-        self.Pump.speed_conversion = 1.5
+        self.Pump.speed_conversion = 1.9
         self.Protocol.speed = 1
         self.Protocol.closed_speed = 0.25
         self.Protocol.wait_factor = self.Pump.wait_factor
