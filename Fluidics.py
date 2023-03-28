@@ -80,6 +80,9 @@ class Fluidics(object):
 
     def interpret_message(self,message):
         protocol,chambers,other = message.split('*')
+        if '!' in other:
+            other = other.split('!')[0]
+            self.simulate = True
         chambers = chambers[1:-1].split(',')
         if 'Flush' in protocol:
             chambers = self.Valve_Commands
@@ -92,12 +95,15 @@ class Fluidics(object):
         if not isinstance(steps,pd.DataFrame):
             self.update_user('Unknown Protocol: '+str(protocol))
         else:
-            for idx,step in steps.iterrows():
-                self.update_user(pd.DataFrame(step).T)
-                if step.direction == 'Wait':
-                    precise_sleep(step.pause)
-                else:
-                    self.flow(step.port,step.volume,step.speed,step.pause,step.direction)
+            self.summarize_protocol(steps)
+            if not self.simulate:
+                for idx,step in steps.iterrows():
+                    self.update_user(pd.DataFrame(step).T)
+                    if step.direction == 'Wait':
+                        precise_sleep(step.pause)
+                    else:
+                        self.flow(step.port,step.volume,step.speed,step.pause,step.direction)
+        self.simulate = False
 
     def flow(self,port,volume,speed,pause,direction):
         self.set_port(port)
@@ -127,6 +133,17 @@ class Fluidics(object):
                 time.sleep(t/10)
                 if t>0:
                     self.update_user('          '+str(round((i+1)*10))+'% Complete')
+
+    def summarize_protocol(self,steps):
+        self.update_user('Protocol Summary')
+        ports = np.unique(steps['port'])
+        for port in ports:
+            if len(port)>1:
+                total_volume = np.sum([float(i) for i in steps[(steps['port']==port)&(steps['direction']=='Reverse')]['volume']])
+                if total_volume>0:
+                    self.update_user('Port: '+str(port)+'  Total Volume: '+str(total_volume)+'mL')
+        total_time= np.sum([float(i) for i in steps['time_estimate'] if i!=''])
+        self.update_user('Estimated Total Time: '+str(int(total_time))+'s')
 
 if __name__ == '__main__':
     fluidics_class = args.fluidics_class

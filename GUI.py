@@ -100,6 +100,9 @@ class GUI(tk.Frame):
         # Start/Stop button
         self.start_button = ttk.Button(self, text="Start", command=self.send_communication)
         self.start_button.grid(row=3, column=0)
+        # Simulate button
+        self.simulate_button = ttk.Button(self, text="Simulate", command=self.simulate_communication)
+        self.simulate_button.grid(row=4, column=0)
 
         # Make space for non grid items
         for i in range(20):
@@ -108,11 +111,11 @@ class GUI(tk.Frame):
 
         # # Running label
         self.running_label = ttk.Label(self, text="")
-        self.running_label.place(x=50,y=150)
+        self.running_label.place(x=50,y=175)
 
         # # Notifications label
         self.update_label = ttk.Label(self, text="")
-        self.update_label.place(x=50,y=175)
+        self.update_label.place(x=50,y=200)
     
         self.protocol_var.set('')
         self.port_var.set('')
@@ -167,7 +170,14 @@ class GUI(tk.Frame):
                 self.update_labels(self.labels())
                 self.busy = False
         self.master.update()
-        precise_sleep(1)
+        precise_sleep(0.1)
+
+    def simulate_communication(self):
+        self.simulate = True
+
+        self.send_communication()
+
+        self.simulate = False
 
     def send_communication(self):
         # Get selected protocol
@@ -177,10 +187,13 @@ class GUI(tk.Frame):
             self.chamber = '['+''.join([self.chambers[i]+',' for i in range(len(self.chambers)) if self.chamber_vars[i].get()])[:-1]+']'
             self.port = self.port_var.get()
             self.extra = self.extra_entry.get()
+            if self.simulate:
+                self.extra = self.extra+'!'
             if len(str(self.extra))>0:
                 message ='Command:'+self.protocol+'*'+''.join(self.chamber)+'*'+self.port + '+' + str(self.extra)
             else:
                 message ='Command:'+self.protocol+'*'+''.join(self.chamber)+'*'+self.port
+            
             # Check Availability
             self.update_user('Checking Device Availability')
             self.start_button_text = 'Running'
@@ -199,7 +212,7 @@ class GUI(tk.Frame):
             self.update_user('Checking if Device is Reponsive')
             self.update_label_text = "Checking if Device is Reponsive"
             self.update_labels(self.labels())
-            self.wait_until_message(['Running'],max_wait_time=60*5)
+            self.wait_until_message(['Running','Finished'],max_wait_time=60*5)
             
             # Block until Done
             self.update_user('Waiting Until Protocol is Complete')
