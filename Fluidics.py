@@ -11,6 +11,7 @@ import importlib
 import threading
 import sys
 import os
+from math import floor,ceil
 
 dir = os.path.dirname(os.path.abspath(__file__))
 for file in os.listdir(dir):
@@ -103,6 +104,8 @@ class Fluidics(object):
                         precise_sleep(step.pause)
                     else:
                         self.flow(step.port,step.volume,step.speed,step.pause,step.direction)
+            else:
+                precise_sleep(60*0.5) # wait 0.5 minutes
         self.simulate = False
 
     def flow(self,port,volume,speed,pause,direction):
@@ -143,7 +146,18 @@ class Fluidics(object):
                 if total_volume>0:
                     self.update_user('Port: '+str(port)+'  Total Volume: '+str(total_volume)+'mL')
         total_time= np.sum([float(i) for i in steps['time_estimate'] if i!=''])
-        self.update_user('Estimated Total Time: '+str(int(total_time))+'s')
+        if total_time<60:
+            self.update_user('Estimated Total Time: '+str(int(total_time))+'s')
+        elif total_time<60*60:
+            minutes = floor(total_time/60)
+            total_time = total_time-(minutes*60)
+            self.update_user('Estimated Total Time: '+str(int(minutes))+'m'+str(int(total_time))+'s')
+        else:
+            hours = floor(total_time/(60*60))
+            total_time = total_time-(hours*60*60)
+            minutes = floor(total_time/60)
+            total_time = total_time-(minutes*60)
+            self.update_user('Estimated Total Time: '+str(int(hours))+'h'+str(int(minutes))+'m'+str(int(total_time))+'s')
 
 if __name__ == '__main__':
     fluidics_class = args.fluidics_class

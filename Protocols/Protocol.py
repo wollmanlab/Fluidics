@@ -35,6 +35,7 @@ class Protocol:
         self.protocols['Storage2Gel'] = self.Storage2Gel
         self.protocols['Gel2Hybe'] = self.Gel2Hybe
         self.protocols['Hybe2Image'] = self.Hybe2Image
+        self.protocols['PrepSample'] = self.PrepSample
 
     def update_user(self,message,level=20):
         if self.verbose:
@@ -236,12 +237,12 @@ class Protocol:
         for i in range(3):
             steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=60*5))
         # Clearing
-        for iter in range(4):
+        for iter in range(3):
             for i in range(3):
                 steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=60*5))
             steps.append(self.replace_volume(chambers,'ProtKSDS',self.rinse_volume,speed=self.speed,pause=60*60*3))
         # Remove SDS
-        for i in range(4):
+        for i in range(3):
             steps.append(self.replace_volume(chambers,'EthyleneCarbonate',self.rinse_volume,speed=self.speed,pause=60*15))
         # Wash
         for i in range(3):
@@ -255,7 +256,7 @@ class Protocol:
     def Hybe2Image(self,chambers,other):
         steps = []
         # Wash
-        for i in range(4):
+        for i in range(3):
             steps.append(self.replace_volume(chambers,'Formamide',self.rinse_volume,speed=self.speed,pause=60*15))
         # Buffer Exchange
         for i in range(3):
@@ -265,6 +266,15 @@ class Protocol:
         # Wash
         for i in range(3):
             steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=60*5))
+        return pd.concat(steps,ignore_index=True)
+    
+    def PrepSample(self,chambers,other):
+        steps = []
+        steps.append(self.Storage2Gel(chambers,other))
+        steps.append(self.replace_volume(chambers,'Gel',3,speed=self.speed,pause=60*60*3))
+        steps.append(self.Gel2Hybe(chambers,other))
+        steps.append(self.replace_volume(chambers,'Hybe',0.5,speed=self.speed,pause=36*60*60))
+        steps.append(self.Hybe2Image(chambers,other))
         return pd.concat(steps,ignore_index=True)
 
 

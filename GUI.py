@@ -212,7 +212,7 @@ class GUI(tk.Frame):
             self.update_user('Checking if Device is Reponsive')
             self.update_label_text = "Checking if Device is Reponsive"
             self.update_labels(self.labels())
-            self.wait_until_message(['Running','Finished'],max_wait_time=60*5)
+            self.wait_until_message(['Running'],max_wait_time=60*5)
             
             # Block until Done
             self.update_user('Waiting Until Protocol is Complete')

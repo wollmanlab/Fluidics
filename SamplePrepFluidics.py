@@ -22,6 +22,7 @@ class SamplePrepFluidics(Fluidics):
         self.Protocol.closed_speed = 0.25
         self.Protocol.wait_factor = self.Pump.wait_factor
         self.Protocol.speed_conversion = self.Pump.speed_conversion
+        self.Protocol.rinse_volume = 2.5
 
         chamber_valve = 1
         self.Valve_Commands = {
