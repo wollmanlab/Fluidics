@@ -13,6 +13,12 @@ class NinjaFluidics(Fluidics):
         self.Protocol = Protocol(gui=gui)
         self.Pump = Pump('COM6',gui=gui)
         self.Valve = Valve('COM7',gui=gui)
+        self.Pump.wait_factor = 1/2
+        self.Pump.speed_conversion = 1.9 #s/mL
+        self.Protocol.speed = 1
+        self.Protocol.closed_speed = 0.25
+        self.Protocol.wait_factor = self.Pump.wait_factor
+        self.Protocol.speed_conversion = self.Pump.speed_conversion
         self.Valve_Commands = {
                                 'Waste':{'valve':4,'port':10},
                                 'A':{'valve':4,'port':2},
