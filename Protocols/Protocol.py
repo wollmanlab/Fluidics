@@ -37,9 +37,10 @@ class Protocol:
         self.protocols['Hybe2Image'] = self.Hybe2Image
         self.protocols['PrepSample'] = self.PrepSample
 
-    def update_user(self,message,level=20):
+    def update_user(self,message,level=20,logger='Protocol'):
+        logger = self.device +'***' + logger
         if self.verbose:
-            update_user(message,level=level,logger=None)
+            update_user(message,level=level,logger=logger)
             
     def get_steps(self,protocol,chambers,other):
         steps = self.protocols[protocol](chambers,other)
@@ -92,6 +93,8 @@ class Protocol:
 
     def prime(self,Valve_Commands,tube):
         tube,volume = tube.split('+')
+        if tube == '':
+            tube = 'Waste'
         volume = float(volume)
         steps = []
         for port in Valve_Commands.keys():
@@ -211,18 +214,18 @@ class Protocol:
     def Storage2Gel(self,chambers,other):
         steps = []
         # Remove From Storage
-        for i in range(3):
-            steps.append(self.replace_volume(chambers,'PBS',self.rinse_volume,speed=self.speed,pause=60*5))
-        # Permeabilize
-        steps.append(self.replace_volume(chambers,'TPERM',self.rinse_volume,speed=self.speed,pause=60*30))
-        # Wash
-        for i in range(3):
-            steps.append(self.replace_volume(chambers,'PBS',self.rinse_volume,speed=self.speed,pause=60*5))
-        # Buffer Exchange
-        for i in range(3):
-            steps.append(self.replace_volume(chambers,'MOPS',self.rinse_volume,speed=self.speed,pause=60*5))
-        # MelphaX
-        steps.append(self.replace_volume(chambers,'MelphaX',self.rinse_volume,speed=self.speed,pause=60*60*18))
+        # for i in range(3):
+        #     steps.append(self.replace_volume(chambers,'PBS',self.rinse_volume,speed=self.speed,pause=60*5))
+        # # Permeabilize
+        # steps.append(self.replace_volume(chambers,'TPERM',self.rinse_volume,speed=self.speed,pause=60*30))
+        # # Wash
+        # for i in range(3):
+        #     steps.append(self.replace_volume(chambers,'PBS',self.rinse_volume,speed=self.speed,pause=60*5))
+        # # Buffer Exchange
+        # for i in range(3):
+        #     steps.append(self.replace_volume(chambers,'MOPS',self.rinse_volume,speed=self.speed,pause=60*5))
+        # # MelphaX
+        # steps.append(self.replace_volume(chambers,'MelphaX',self.rinse_volume,speed=self.speed,pause=60*60*18))
         # Wash
         for i in range(3):
             steps.append(self.replace_volume(chambers,'PBS',self.rinse_volume,speed=self.speed,pause=60*5))
@@ -240,7 +243,7 @@ class Protocol:
         for iter in range(3):
             for i in range(3):
                 steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=60*5))
-            steps.append(self.replace_volume(chambers,'ProtKSDS',self.rinse_volume,speed=self.speed,pause=60*60*3))
+            steps.append(self.replace_volume(chambers,'ProtKSDS',self.rinse_volume,speed=self.speed,pause=60*60*4))
         # Remove SDS
         for i in range(3):
             steps.append(self.replace_volume(chambers,'EthyleneCarbonate',self.rinse_volume,speed=self.speed,pause=60*15))
@@ -262,7 +265,7 @@ class Protocol:
         for i in range(3):
             steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=60*5))
         # Clearing
-        steps.append(self.replace_volume(chambers,'ProtK',self.rinse_volume,speed=self.speed,pause=60*60*4))
+        steps.append(self.replace_volume(chambers,'ProtK',self.rinse_volume,speed=self.speed,pause=60*60*2))
         # Wash
         for i in range(3):
             steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=60*5))
