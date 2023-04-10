@@ -10,6 +10,7 @@ class Valve:
         self.current_port = {}
 
     def update_user(self,message,level=20,logger='Valve'):
+        logger = self.device +'***' + logger
         if self.verbose:
             update_user(message,level=level,logger=logger)
 
