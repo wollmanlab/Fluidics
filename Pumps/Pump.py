@@ -12,6 +12,7 @@ class Pump:
         self.speed = 0
 
     def update_user(self,message,level=20,logger='Pump'):
+        logger = self.device +'***' + logger
         if self.verbose:
             update_user(message,level=level,logger=logger)
 
