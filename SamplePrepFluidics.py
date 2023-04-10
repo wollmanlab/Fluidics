@@ -16,6 +16,10 @@ class SamplePrepFluidics(Fluidics):
         self.Protocol = Protocol(gui=gui)
         self.Pump = Pump('/dev/ttyACM0',gui=gui)
         self.Valve = Valve('/dev/ttyUSB0',gui=gui)
+        self.device = self.__class__.__name__
+        self.Protocol.device = self.device
+        self.Pump.device = self.device
+        self.Valve.device = self.device
         self.Pump.wait_factor = 1/2
         self.Pump.speed_conversion = 1.9
         self.Protocol.speed = 1
@@ -24,8 +28,13 @@ class SamplePrepFluidics(Fluidics):
         self.Protocol.speed_conversion = self.Pump.speed_conversion
         self.Protocol.rinse_volume = 2.5
 
-        chamber_valve = 1
         self.Valve_Commands = {
+                                'A':{'valve':1,'port':1},
+                                'B':{'valve':1,'port':2},
+                                'C':{'valve':1,'port':3},
+                                'D':{'valve':1,'port':4},
+                                'E':{'valve':1,'port':5},
+                                'F':{'valve':1,'port':6},
                                 'Waste':{'valve':1,'port':13},
                                 'TBS':{'valve':1,'port':24},
                                 'PBS':{'valve':1,'port':23},
@@ -37,8 +46,7 @@ class SamplePrepFluidics(Fluidics):
                                 'ProtK':{'valve':1,'port':17},
                                 'MelphaX':{'valve':1,'port':16},
                             }
-        for i in range(6):
-                self.Valve_Commands[chr(ord('A') + i)] = {'valve':chamber_valve,'port':i+1}
+        
 
 
 
