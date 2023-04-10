@@ -28,11 +28,13 @@ if __name__ == '__main__':
 class Fluidics(object):
     def __init__(self,gui=False):
         self.verbose=True
+        self.simulate = False
         # self.Protocol = Protocol(gui=gui)
         # self.Pump = Pump(gui=gui)
         # self.Valve = Valve(gui=gui)
-        self.file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),'Status.txt')
-        print(self.file_path)
+
+        self.device = self.__class__.__name__
+        self.file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),self.device+'_Status.txt')
         self.last_message = ""
         self.Valve_Commands = {}
         self.busy=False
@@ -44,6 +46,7 @@ class Fluidics(object):
             self.update_communication('Available')
 
     def update_user(self,message,level=20,logger='Fluidics'):
+        logger = self.device +'***' + logger
         if self.verbose:
             update_user(message,level=level,logger=logger)
 
@@ -105,7 +108,7 @@ class Fluidics(object):
                     else:
                         self.flow(step.port,step.volume,step.speed,step.pause,step.direction)
             else:
-                precise_sleep(60*0.5) # wait 0.5 minutes
+                precise_sleep(60*0.1) # wait 0.5 minutes
         self.simulate = False
 
     def flow(self,port,volume,speed,pause,direction):
