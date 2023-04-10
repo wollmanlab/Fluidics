@@ -13,6 +13,10 @@ class RamboFluidics(Fluidics):
         self.Protocol = Protocol(gui=gui)
         self.Pump = Pump('COM15',gui=gui)
         self.Valve = Valve('COM16',gui=gui)
+        self.device = self.__class__.__name__
+        self.Protocol.device = self.device
+        self.Pump.device = self.device
+        self.Valve.device = self.device
         self.Pump.wait_factor = 1/2
         self.Pump.speed_conversion = 1.9
         self.Protocol.speed = 1
