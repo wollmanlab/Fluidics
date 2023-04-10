@@ -17,6 +17,7 @@ if __name__ == '__main__':
 class GUI(tk.Frame):
     def __init__(self, master=None,fluidics_class='Fluidics'):
         super().__init__(master)
+        self.simulate = False
         self.busy = False
         self.verbose = True
         self.master = master
@@ -46,6 +47,8 @@ class GUI(tk.Frame):
         self.start_button_text = 'Start'
         self.running_label_text = ""
         self.update_label_text = ""
+
+        
         
         self.create_widgets()
 
