@@ -32,7 +32,7 @@ class SyringeProtocol(Protocol):
             for s in range(n_steps):
                 steps.append(self.format(port=outport,volume=iter_volume,speed=speed,pause=iter_pause,direction='Forward'))
         steps.append(self.wait(1))
-        steps.append(self.format(port='Waste',volume=self.closed_volume_buffer,speed=self.max_speed ,pause=0,direction='Forward'))
+        steps.append(self.format(port='Waste',volume=self.closed_volume_buffer,speed=1,pause=0,direction='Forward'))
         steps.append(self.wait(1))
         return pd.concat(steps,ignore_index=True)
     
