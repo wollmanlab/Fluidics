@@ -92,6 +92,8 @@ class Fluidics(object):
             chambers = self.Valve_Commands
         if 'Prime' in protocol:
             chambers = self.Valve_Commands
+        if 'Clean' in protocol:
+            chambers = self.Valve_Commands
         return protocol,chambers,other
 
     def execute_protocol(self,protocol,chambers,other):
