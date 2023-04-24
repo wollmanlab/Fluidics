@@ -87,6 +87,10 @@ class Fluidics(object):
         if '!' in other:
             other = other.split('!')[0]
             self.simulate = True
+            self.Protocol.simulate = True
+        if '+' in other:
+            if other.split('+')[-1] =='':
+                other = other.split('+')[0]
         chambers = chambers[1:-1].split(',')
         if 'Flush' in protocol:
             chambers = self.Valve_Commands
@@ -112,6 +116,7 @@ class Fluidics(object):
             else:
                 precise_sleep(60*0.1) # wait 0.5 minutes
         self.simulate = False
+        self.Protocol.simulate = False
 
     def flow(self,port,volume,speed,pause,direction):
         self.set_port(port)
