@@ -10,8 +10,9 @@ class SyringeProtocol(Protocol):
         if speed == 0:
             speed = self.speed
         steps = []
-        steps.append(self.empty_chamber(outport,speed=self.max_speed,pause=0))
-        steps.append(self.wait(1))
+        if outport!='Waste':
+            steps.append(self.empty_chamber(outport,speed=self.max_speed,pause=0))
+            steps.append(self.wait(1))
         steps.append(self.add_liquid(inport,outport,volume,speed=speed,pause=pause))
         steps.append(self.wait(1))
         return pd.concat(steps,ignore_index=True)
