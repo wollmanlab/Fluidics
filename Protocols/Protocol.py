@@ -23,6 +23,7 @@ class Protocol:
         self.primed = False
 
         self.protocols['Valve'] = self.valve
+        self.protocols['Clean'] = self.clean
         self.protocols['Hybe'] = self.hybe
         self.protocols['Strip'] = self.strip
         self.protocols['ReverseFlush'] = self.reverse_flush
@@ -35,7 +36,11 @@ class Protocol:
         self.protocols['Storage2Gel'] = self.Storage2Gel
         self.protocols['Gel2Hybe'] = self.Gel2Hybe
         self.protocols['Hybe2Image'] = self.Hybe2Image
+        self.protocols['Hybe2ImageNoProtk'] = self.Hybe2ImageNoProtk
         self.protocols['PrepSample'] = self.PrepSample
+        self.protocols['MelphaX2Gel'] = self.MelphaX2Gel
+        self.protocols['PolyTHybeCustom'] = self.PolyTHybeCustom
+        
 
     def update_user(self,message,level=20,logger='Protocol'):
         logger = self.device +'***' + logger
@@ -89,6 +94,14 @@ class Protocol:
         steps = []
         for port in Valve_Commands.keys():
             steps.append(self.add_liquid(tube,port,float(volume),speed=1,pause=0))
+        return pd.concat(steps,ignore_index=True)
+    
+    def clean(self,Valve_Commands,tube):
+        steps = []
+        steps.append(self.reverse_flush(Valve_Commands,tube))
+        steps.append(self.wait(60*5)) #5 min
+        steps.append(self.prime(Valve_Commands,tube.split('+')[0]+'+5'))
+
         return pd.concat(steps,ignore_index=True)
 
     def prime(self,Valve_Commands,tube):
@@ -214,18 +227,18 @@ class Protocol:
     def Storage2Gel(self,chambers,other):
         steps = []
         # Remove From Storage
-        # for i in range(3):
-        #     steps.append(self.replace_volume(chambers,'PBS',self.rinse_volume,speed=self.speed,pause=60*5))
-        # # Permeabilize
-        # steps.append(self.replace_volume(chambers,'TPERM',self.rinse_volume,speed=self.speed,pause=60*30))
-        # # Wash
-        # for i in range(3):
-        #     steps.append(self.replace_volume(chambers,'PBS',self.rinse_volume,speed=self.speed,pause=60*5))
-        # # Buffer Exchange
-        # for i in range(3):
-        #     steps.append(self.replace_volume(chambers,'MOPS',self.rinse_volume,speed=self.speed,pause=60*5))
-        # # MelphaX
-        # steps.append(self.replace_volume(chambers,'MelphaX',self.rinse_volume,speed=self.speed,pause=60*60*18))
+        for i in range(3):
+            steps.append(self.replace_volume(chambers,'PBS',self.rinse_volume,speed=self.speed,pause=60*5))
+        # Permeabilize
+        steps.append(self.replace_volume(chambers,'TPERM',self.rinse_volume,speed=self.speed,pause=60*30))
+        # Wash
+        for i in range(3):
+            steps.append(self.replace_volume(chambers,'PBS',self.rinse_volume,speed=self.speed,pause=60*5))
+        # Buffer Exchange
+        for i in range(3):
+            steps.append(self.replace_volume(chambers,'MOPS',self.rinse_volume,speed=self.speed,pause=60*5))
+        # MelphaX
+        steps.append(self.replace_volume(chambers,'MelphaX',self.rinse_volume,speed=self.speed,pause=60*60*18))
         # Wash
         for i in range(3):
             steps.append(self.replace_volume(chambers,'PBS',self.rinse_volume,speed=self.speed,pause=60*5))
@@ -258,6 +271,9 @@ class Protocol:
 
     def Hybe2Image(self,chambers,other):
         steps = []
+        if '+' in other:
+            wait_time = 60*60*int(other.split('+')[-1]) # hours
+            steps.append(self.wait(wait_time)) 
         # Wash
         for i in range(3):
             steps.append(self.replace_volume(chambers,'Formamide',self.rinse_volume,speed=self.speed,pause=60*15))
@@ -271,6 +287,21 @@ class Protocol:
             steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=60*5))
         return pd.concat(steps,ignore_index=True)
     
+    def Hybe2ImageNoProtk(self,chambers,other):
+        steps = []
+        # Wash
+        for i in range(3):
+            steps.append(self.replace_volume(chambers,'Formamide',self.rinse_volume,speed=self.speed,pause=60*15))
+        # Buffer Exchange
+        for i in range(3):
+            steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=60*5))
+        # Clearing
+        # steps.append(self.replace_volume(chambers,'ProtK',self.rinse_volume,speed=self.speed,pause=60*60*2))
+        # Wash
+        # for i in range(3):
+            # steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=60*5))
+        return pd.concat(steps,ignore_index=True)
+    
     def PrepSample(self,chambers,other):
         steps = []
         steps.append(self.Storage2Gel(chambers,other))
@@ -280,7 +311,87 @@ class Protocol:
         steps.append(self.Hybe2Image(chambers,other))
         return pd.concat(steps,ignore_index=True)
 
+      
+    def MelphaX2Gel(self,chambers,other):
+        steps = []
+        for i in range(3):
+            steps.append(self.replace_volume(chambers,'PBS',self.rinse_volume,speed=self.speed,pause=60*5))
+        # Buffer Exchange
+        for i in range(3):
+            steps.append(self.replace_volume(chambers,'MOPS',self.rinse_volume,speed=self.speed,pause=60*5))
+        # MelphaX
+        steps.append(self.replace_volume(chambers,'MelphaX',self.rinse_volume,speed=self.speed,pause=60*60*18))
+        # Wash
+        for i in range(3):
+            steps.append(self.replace_volume(chambers,'PBS',self.rinse_volume,speed=self.speed,pause=60*5))
+        # Buffer Exchange
+        for i in range(3):
+            steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=60*5))
+        return pd.concat(steps,ignore_index=True)
+    
+    def PolyTHybeCustom(self,chambers,other):
+        hybe_time = 12
+        if '+' in other:
+            if other.split('+')[-1] !='':
+                hybe_time = int(other.split('+')[-1])
+        steps = []
+        # A - 20 um Fresh
+        # B - 20 um Ethanol
+        # C - 20 um Gel
+        # D - 100 um Fresh
+        # E - 100 um Ethanol
+        # F - 
+        fresh_batch = ['A','D']
+        ethanol_batch = ['B','E']
+        gel_batch = ['C']
+        # WASH
+        for i in range(3):
+            steps.append(self.replace_volume(fresh_batch,'PBS',self.rinse_volume,speed=self.speed,pause=0))
+            steps.append(self.replace_volume(ethanol_batch,'PBS',self.rinse_volume,speed=self.speed,pause=0))
+            steps.append(self.replace_volume(gel_batch,'TBS',self.rinse_volume,speed=self.speed,pause=0))
+            steps.append(self.wait(60*5))
+        # Permeabilize
+        steps.append(self.replace_volume(fresh_batch,'TPERM',self.rinse_volume,speed=self.speed,pause=0))
+        steps.append(self.replace_volume(ethanol_batch,'TPERM',self.rinse_volume,speed=self.speed,pause=0))
+        steps.append(self.wait(60*30))
+        # WASH
+        for i in range(3):
+            steps.append(self.replace_volume(fresh_batch,'PBS',self.rinse_volume,speed=self.speed,pause=0))
+            steps.append(self.replace_volume(ethanol_batch,'PBS',self.rinse_volume,speed=self.speed,pause=0))
+            steps.append(self.replace_volume(gel_batch,'TBS',self.rinse_volume,speed=self.speed,pause=0))
+            steps.append(self.wait(60*5))
+        # WASH
+        for i in range(3):
+            steps.append(self.replace_volume(fresh_batch,'TBS',self.rinse_volume,speed=self.speed,pause=0))
+            steps.append(self.replace_volume(ethanol_batch,'TBS',self.rinse_volume,speed=self.speed,pause=0))
+            steps.append(self.replace_volume(gel_batch,'TBS',self.rinse_volume,speed=self.speed,pause=0))
+            steps.append(self.wait(60*5))
 
+        # WASH
+        for i in range(1):
+            steps.append(self.replace_volume(fresh_batch,'Formamide',self.rinse_volume,speed=self.speed,pause=0))
+            steps.append(self.replace_volume(ethanol_batch,'Formamide',self.rinse_volume,speed=self.speed,pause=0))
+            steps.append(self.replace_volume(gel_batch,'Formamide',self.rinse_volume,speed=self.speed,pause=0))
+            steps.append(self.wait(60*30))
+
+        # HYBE
+        steps.append(self.wait(60*60*hybe_time))
+
+        # WASH
+        for i in range(3):
+            steps.append(self.replace_volume(fresh_batch,'Formamide',self.rinse_volume,speed=self.speed,pause=0))
+            steps.append(self.replace_volume(ethanol_batch,'Formamide',self.rinse_volume,speed=self.speed,pause=0))
+            steps.append(self.replace_volume(gel_batch,'Formamide',self.rinse_volume,speed=self.speed,pause=0))
+            steps.append(self.wait(60*20))
+
+        # WASH
+        for i in range(3):
+            steps.append(self.replace_volume(fresh_batch,'TBS',self.rinse_volume,speed=self.speed,pause=0))
+            steps.append(self.replace_volume(ethanol_batch,'TBS',self.rinse_volume,speed=self.speed,pause=0))
+            steps.append(self.replace_volume(gel_batch,'TBS',self.rinse_volume,speed=self.speed,pause=0))
+            steps.append(self.wait(60*5))
+
+        return pd.concat(steps,ignore_index=True)
 
 
 
