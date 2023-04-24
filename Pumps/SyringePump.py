@@ -15,6 +15,9 @@ class SyringePump(Pump):
             self.serial = serial.Serial(com_port, 9600, timeout=2)
 
     def flow(self,volume):
+        self.pinMode(13,"OUTPUT")
+        self.digitalWrite(13,'HIGH')
+
         speed = self.speed
         # print(speed)
         # 25% increments
@@ -32,7 +35,7 @@ class SyringePump(Pump):
             self.update_user('Unknown Direction: ',self.direction)
             pin = 13 # LED PIN
         self.pinMode(pin,"OUTPUT")
-        flow_time = self.calcualte_flow_time(volume)
+        flow_time = self.calculate_flow_time(volume)
         if speed ==1:
             self.digitalWrite(pin,'HIGH')
             precise_sleep(flow_time)
@@ -96,8 +99,10 @@ class SyringePump(Pump):
             #         completed_flow_time+=dt
             #     iter+=1
             # self.digitalWrite(pin,'LOW')
+        self.pinMode(13,"OUTPUT")
+        self.digitalWrite(13,'LOW')
 
-    def calcualte_flow_time(self,volume):
+    def calculate_flow_time(self,volume):
         flow_time = float(volume)*float(self.speed_conversion)
         return flow_time
 
