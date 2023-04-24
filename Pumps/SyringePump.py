@@ -42,7 +42,7 @@ class SyringePump(Pump):
             self.digitalWrite(pin,'LOW')
             precise_sleep(flow_time*self.wait_factor) #wait for syringe to fill or empty
         else:
-            dt = 0.25
+            dt = 0.5
             n_pos_steps = int(flow_time/dt)
             n_steps = int((flow_time/dt)/speed)
             steps = np.zeros(n_steps)
