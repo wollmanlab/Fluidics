@@ -2,7 +2,7 @@ import serial
 import sys
 import time
 
-device = serial.Serial(port = 'COM6', baudrate = 9600, bytesize = serial.EIGHTBITS,parity = serial.PARITY_NONE, stopbits = serial.STOPBITS_ONE, timeout = 0.1)
+device = serial.Serial(port = 'COM7', baudrate = 9600, bytesize = serial.EIGHTBITS,parity = serial.PARITY_NONE, stopbits = serial.STOPBITS_ONE, timeout = 0.1)
 carriage_return = bytes("\r", 'utf-8')
 negative_acknowledge = ""
 read_length = 64
