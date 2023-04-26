@@ -14,8 +14,8 @@ class DevFluidics(Fluidics):
         Pump = getattr(importlib.import_module('SyringePump'), 'SyringePump')
         Valve = getattr(importlib.import_module('ViciValve'), 'ViciValve')
         self.Protocol = Protocol(gui=gui)
-        self.Pump = Pump('COM4',gui=gui)
-        self.Valve = Valve('COM6',gui=gui)
+        self.Pump = Pump('COM6',gui=gui)
+        self.Valve = Valve('COM7',gui=gui)
         self.device = self.__class__.__name__
         self.Protocol.device = self.device
         self.Pump.device = self.device
