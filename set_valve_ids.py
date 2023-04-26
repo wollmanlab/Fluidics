@@ -21,6 +21,12 @@ time.sleep(1)
 response = device.read(read_length).split(carriage_return)
 print(response)
 
+message = bytes('ID'+ID+'\r', 'utf-8')	
+device.write(message)
+time.sleep(1)
+response = device.read(read_length).split(carriage_return)
+print(response)
+
 message = bytes(ID+'GO1\r', 'utf-8')	
 device.write(message)
 time.sleep(1)
