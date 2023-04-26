@@ -17,7 +17,7 @@ class Protocol:
         self.hybe_time = 600
         self.max_speed = 1
         self.speed = 1
-        self.closed_speed = 1#0.25
+        self.closed_speed = 0.3
         self.wait_factor = 0
         self.speed_conversion = 1.5
         self.primed = False
@@ -81,7 +81,7 @@ class Protocol:
         return pd.concat(steps,ignore_index=True)
 
     def format(self,port='A',volume=0,speed=1,pause=0,direction='Forward'):
-        time_estimate = (float(volume)/float(speed))*self.speed_conversion+1+float(pause)
+        time_estimate = ((float(volume)/float(speed))*self.speed_conversion)+1+float(pause)
         return pd.DataFrame([port,volume,speed,pause,direction,time_estimate],index = ['port','volume','speed','pause','direction','time_estimate']).T
 
 
