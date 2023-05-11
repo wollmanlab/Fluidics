@@ -1,3 +1,11 @@
+# TO RUN GUI
+#   $ C:\Users\wollmanlab\miniconda3\envs\py37\python.exe C:\GitRepos\Fluidics\GUI.py -f DevFluidics_v2
+#   $ C:\Users\wollmanlab\miniconda3\envs\py37\python.exe C:\GitRepos\Fluidics\Fluidics.py -f DevFluidics_v2
+
+# In the above code, you initialize the Fluidics executable and then overwrite the fluidics class with details from 
+# the file that follows '-f', so in this case DevFluidics_v2 contains the details of our syringe pump and comports
+
+
 import tkinter as tk
 from tkinter import ttk
 import threading
