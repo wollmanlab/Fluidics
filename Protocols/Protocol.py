@@ -94,6 +94,8 @@ class Protocol:
         volume = float(volume)
         steps = []
         for port in Valve_Commands.keys():
+            if ('ProtK' in port)|('MelphaX' in port):
+                steps.append(self.add_liquid(tube,port,float(volume),speed=1,pause=0))
             steps.append(self.add_liquid(tube,port,float(volume),speed=1,pause=0))
         return pd.concat(steps,ignore_index=True)
     
@@ -112,6 +114,8 @@ class Protocol:
         volume = float(volume)
         steps = []
         for port in Valve_Commands.keys():
+            if ('ProtK' in port)|('MelphaX' in port):
+                steps.append(self.add_liquid(port,tube,volume,speed=1,pause=0))
             steps.append(self.add_liquid(port,tube,volume,speed=1,pause=0))
         return pd.concat(steps,ignore_index=True)
 
@@ -265,7 +269,7 @@ class Protocol:
         for i in range(3):
             steps.append(self.replace_volume(chambers,'MOPS',self.rinse_volume,speed=self.speed,pause=60*5))
         # MelphaX
-        steps.append(self.replace_volume(chambers,'MelphaX',self.rinse_volume,speed=self.speed,pause=60*60*18))
+        steps.append(self.replace_volume(chambers,'MelphaX',self.rinse_volume,speed=self.speed,pause=60*60*16))
         # Wash
         for i in range(3):
             steps.append(self.replace_volume(chambers,'PBS',self.rinse_volume,speed=self.speed,pause=60*5))
@@ -280,10 +284,10 @@ class Protocol:
         for i in range(3):
             steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=60*5))
         # Clearing
-        for iter in range(3):
+        for iter in range(1):
             for i in range(3):
                 steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=60*5))
-            steps.append(self.replace_volume(chambers,'ProtKSDS',self.rinse_volume,speed=self.speed,pause=60*60*4))
+                steps.append(self.replace_volume(chambers,'ProtKSDS',self.rinse_volume,speed=self.speed,pause=60*60*4))
         # Remove SDS
         for i in range(3):
             steps.append(self.replace_volume(chambers,'EthyleneCarbonate',self.rinse_volume,speed=self.speed,pause=60*15))
@@ -405,18 +409,18 @@ class Protocol:
         steps.append(self.wait(60*60*hybe_time))
 
         # WASH
-        for i in range(3):
-            steps.append(self.replace_volume(fresh_batch,'Formamide',self.rinse_volume,speed=self.speed,pause=0))
-            steps.append(self.replace_volume(ethanol_batch,'Formamide',self.rinse_volume,speed=self.speed,pause=0))
-            steps.append(self.replace_volume(gel_batch,'Formamide',self.rinse_volume,speed=self.speed,pause=0))
-            steps.append(self.wait(60*20))
+        #for i in range(3):
+            #steps.append(self.replace_volume(fresh_batch,'Formamide',self.rinse_volume,speed=self.speed,pause=0))
+            #steps.append(self.replace_volume(ethanol_batch,'Formamide',self.rinse_volume,speed=self.speed,pause=0))
+            #steps.append(self.replace_volume(gel_batch,'Formamide',self.rinse_volume,speed=self.speed,pause=0))
+            #steps.append(self.wait(60*20))
 
         # WASH
-        for i in range(3):
-            steps.append(self.replace_volume(fresh_batch,'TBS',self.rinse_volume,speed=self.speed,pause=0))
-            steps.append(self.replace_volume(ethanol_batch,'TBS',self.rinse_volume,speed=self.speed,pause=0))
-            steps.append(self.replace_volume(gel_batch,'TBS',self.rinse_volume,speed=self.speed,pause=0))
-            steps.append(self.wait(60*5))
+        #for i in range(3):
+            #steps.append(self.replace_volume(fresh_batch,'TBS',self.rinse_volume,speed=self.speed,pause=0))
+            #steps.append(self.replace_volume(ethanol_batch,'TBS',self.rinse_volume,speed=self.speed,pause=0))
+            #steps.append(self.replace_volume(gel_batch,'TBS',self.rinse_volume,speed=self.speed,pause=0))
+            #steps.append(self.wait(60*5))
 
         return pd.concat(steps,ignore_index=True)
 
