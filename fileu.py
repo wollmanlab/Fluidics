@@ -37,13 +37,15 @@ def update_user(message,level=20,logger=None):
             message = f"\n{message.to_string()}"
         except:
             message = str(message)
+    device = ''
     # message = str(datetime.now().strftime("%H:%M:%S"))+' '+message
-    print(str(datetime.now().strftime("%H:%M:%S"))+' '+message)
+    # print(str(datetime.now().strftime("%H:%M:%S"))+' '+message)
     if isinstance(logger,logging.Logger):
         log = logger
     elif isinstance(logger,str):
         if '***' in logger:
             device = logger.split('***')[0]
+            # message = device+' '+message
             logger = logger.split(device+'***')[-1]
             # now = datetime.now()
             # day = now.day
@@ -75,6 +77,8 @@ def update_user(message,level=20,logger=None):
         log.error(message)
     elif level>=50:
         log.critical(message)
+
+    print(str(device+' '+datetime.now().strftime("%H:%M:%S"))+' '+message)
 
 def precise_sleep(sleep_time):
     start = time.perf_counter()
