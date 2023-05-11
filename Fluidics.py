@@ -110,7 +110,15 @@ class Fluidics(object):
                 for idx,step in steps.iterrows():
                     self.update_user(pd.DataFrame(step).T)
                     if step.direction == 'Wait':
-                        precise_sleep(step.pause)
+                        if step.pause<100:
+                            precise_sleep(step.pause)
+                        else:
+                            t = step.pause
+                            self.update_user('          Wait '+str(round(t))+'s')
+                            for i in range(10):
+                                precise_sleep(t/10)
+                                if t>0:
+                                    self.update_user('          '+str(round((i+1)*10))+'% Complete')
                     else:
                         self.flow(step.port,step.volume,step.speed,step.pause,step.direction)
             else:
