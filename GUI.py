@@ -30,7 +30,7 @@ class GUI(tk.Frame):
         self.verbose = True
         self.master = master
         self.master.geometry("400x250")
-        self.master.title("Flow Communication")
+        self.master.title(fluidics_class)
         self.grid()
 
         module = importlib.import_module(fluidics_class)
