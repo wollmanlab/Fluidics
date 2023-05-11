@@ -116,7 +116,8 @@ class Protocol:
         return pd.concat(steps,ignore_index=True)
 
     def hybe(self,chambers,hybe):
-        hybe = 'Hybe'+str(hybe)
+        if not 'Hybe' in hybe:
+            hybe = 'Hybe'+str(hybe)
         steps = []
         steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=self.rinse_time))
         steps.append(self.replace_volume(chambers,hybe,self.hybe_volume,speed=self.speed,pause=self.hybe_time))
