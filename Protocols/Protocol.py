@@ -51,7 +51,7 @@ class Protocol:
     
     def wait(self,pause):
         steps = []
-        steps.append(self.format(port='',volume=0,speed=1,pause=pause,direction='Wait'))
+        steps.append(self.format(port='',volume=0,speed=self.max_speed,pause=pause,direction='Wait'))
         return pd.concat(steps,ignore_index=True)
 
     def replace_volume(self,chambers,port,volume,speed=0,pause=0):
@@ -90,8 +90,8 @@ class Protocol:
         steps = []
         for port in Valve_Commands.keys():
             # if ('ProtK' in port)|('MelphaX' in port):
-            #     steps.append(self.add_liquid(tube,port,float(volume),speed=1,pause=0))
-            steps.append(self.add_liquid(tube,port,float(volume),speed=1,pause=0))
+            #     steps.append(self.add_liquid(tube,port,float(volume),speed=self.max_speed,pause=0))
+            steps.append(self.add_liquid(tube,port,float(volume),speed=self.max_speed,pause=0))
         return pd.concat(steps,ignore_index=True)
     
     def clean(self,Valve_Commands,tube):
@@ -110,8 +110,8 @@ class Protocol:
         steps = []
         for port in Valve_Commands.keys():
             # if ('ProtK' in port)|('MelphaX' in port):
-            #     steps.append(self.add_liquid(port,tube,volume,speed=1,pause=0))
-            steps.append(self.add_liquid(port,tube,volume,speed=1,pause=0))
+            #     steps.append(self.add_liquid(port,tube,volume,speed=self.max_speed,pause=0))
+            steps.append(self.add_liquid(port,tube,volume,speed=self.max_speed,pause=0))
         return pd.concat(steps,ignore_index=True)
 
     def hybe(self,chambers,hybe):
@@ -246,7 +246,7 @@ class Protocol:
             for i in range(3):
                 steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=60*5))
         # Buffer Exchange
-        for i in range(3):
+        for i in range(1):
             steps.append(self.replace_volume(chambers,'Formamide',self.rinse_volume,speed=self.speed,pause=60*5))
         return pd.concat(steps,ignore_index=True)
 
