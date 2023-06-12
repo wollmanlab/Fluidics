@@ -1,15 +1,15 @@
 
 from Fluidics import *
 from Fluidics import Fluidics
-from Pumps.SyringePump import SyringePump as Pump
-from Protocols.SyringeProtocol import SyringeProtocol as Protocol
-from Valves.ViciValve import ViciValve as Valve
 
 
 class OrangeFluidics(Fluidics):
     def __init__(self,gui=False):
         super().__init__()  # call __init__ method of the super class
         self.verbose = True
+        Protocol = getattr(importlib.import_module('SyringeProtocol'), 'SyringeProtocol')
+        Pump = getattr(importlib.import_module('SyringePump_v2'), 'SyringePump_v2')
+        Valve = getattr(importlib.import_module('ViciValve'), 'ViciValve')
         self.Protocol = Protocol(gui=gui)
         self.Pump = Pump('COM6',gui=gui)
         self.Valve = Valve('COM7',gui=gui)
@@ -18,7 +18,7 @@ class OrangeFluidics(Fluidics):
         self.Pump.device = self.device
         self.Valve.device = self.device
         self.Pump.wait_factor = 1/2
-        self.Pump.speed_conversion = 1.9 #s/mL
+        self.Pump.speed_conversion = 1.9*(5/4) #s/mL
         self.Protocol.speed = 1
         self.Protocol.closed_speed = 0.25
         self.Protocol.wait_factor = self.Pump.wait_factor
