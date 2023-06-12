@@ -15,8 +15,8 @@ class GreenSamplePrep(Fluidics):
         Pump = getattr(importlib.import_module('SyringePump_v2'), 'SyringePump_v2')
         Valve = getattr(importlib.import_module('ViciValve'), 'ViciValve')
         self.Protocol = Protocol(gui=gui)
-        self.Pump = Pump('/dev/ttyACM0',gui=gui)
-        self.Valve = Valve('/dev/ttyUSB0',gui=gui)
+        self.Pump = Pump('COM4',gui=gui)
+        self.Valve = Valve('COM8',gui=gui)
         self.device = self.__class__.__name__
         self.Protocol.device = self.device
         self.Pump.device = self.device
