@@ -9,7 +9,7 @@ class SyringePump_v2(Pump):
         self.forward = 5
         self.reverse = 4
         self.com_port = com_port
-        self.speed_conversion = 1.5 # mL/s
+        self.speed_conversion = 1.9*(5/4) # mL/s
         self.wait_factor = 1/3
         if not gui:
             self.serial = serial.Serial(com_port, 9600, timeout=2)
@@ -26,7 +26,7 @@ class SyringePump_v2(Pump):
 
         #  // Format is @{direction}%{speed}_{duration}$!
         message = bytes("@{direction}%{speed}_{duration}$!".format(direction=direction, speed=self.speed,duration=duration), 'utf-8')
-        print(message)
+        # print(message)
         try:
             self.serial.write(message)
             self.serial.flush()
