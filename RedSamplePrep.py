@@ -15,8 +15,8 @@ class RedSamplePrep(Fluidics):
         Pump = getattr(importlib.import_module('SyringePump_v2'), 'SyringePump_v2')
         Valve = getattr(importlib.import_module('ViciValve'), 'ViciValve')
         self.Protocol = Protocol(gui=gui)
-        self.Pump = Pump('/dev/ttyACM1',gui=gui)
-        self.Valve = Valve('/dev/ttyUSB1',gui=gui)
+        self.Pump = Pump('COM3',gui=gui)
+        self.Valve = Valve('COM5',gui=gui)
         self.device = self.__class__.__name__
         self.Protocol.device = self.device
         self.Pump.device = self.device
