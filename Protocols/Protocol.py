@@ -115,6 +115,10 @@ class Protocol:
         return pd.concat(steps,ignore_index=True)
 
     def hybe(self,chambers,hybe):
+        wait_time = self.hybe_time
+        if '+' in hybe:
+            hybe,wait_time = hybe.split('+')
+            wait_time = 60*int(wait_time) # minutes
         if not 'Hybe' in hybe:
             hybe = 'Hybe'+str(hybe)
         steps = []
@@ -124,7 +128,7 @@ class Protocol:
                 self.primed = True
         steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=self.rinse_time))
         steps.append(self.prime({hybe:''},'Waste+2'))
-        steps.append(self.replace_volume(chambers,hybe,self.hybe_volume,speed=self.speed,pause=self.hybe_time))
+        steps.append(self.replace_volume(chambers,hybe,self.hybe_volume,speed=self.speed,pause=wait_time))
         steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=self.rinse_time))
         steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=self.rinse_time))
         steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=self.rinse_time))
@@ -132,13 +136,17 @@ class Protocol:
         return pd.concat(steps,ignore_index=True)
 
     def strip(self,chambers,port):
+        wait_time = self.hybe_time
+        if '+' in port:
+            port,wait_time = port.split('+')
+            wait_time = 60*int(wait_time) # minutes
         steps = []
         if not self.primed:
             steps.append(self.prime({'TCEP':'','TBS':'','WBuffer':''},'Waste+2'))
             if not self.simulate:
                 self.primed = True
         steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=self.rinse_time))
-        steps.append(self.replace_volume(chambers,'TCEP',self.hybe_volume,speed=self.speed,pause=self.hybe_time))
+        steps.append(self.replace_volume(chambers,'TCEP',self.hybe_volume,speed=self.speed,pause=wait_time))
         steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=self.rinse_time))
         steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=self.rinse_time))
         steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=self.rinse_time))
