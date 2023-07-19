@@ -1,0 +1,4 @@
+conda create --name py37 python=3.7
+
+pip install pyserial
+pip install pandas
