@@ -21,6 +21,8 @@ class BlueFluidics(Fluidics):
         self.Pump.speed_conversion = 1.9*(5/4)
         self.Protocol.speed = 1
         self.Protocol.closed_speed = 0.3
+        self.Protocol.rinse_volume = 2
+        self.Protocol.hybe_volume = 2
         self.Protocol.wait_factor = self.Pump.wait_factor
         self.Protocol.speed_conversion = self.Pump.speed_conversion
 
