@@ -122,7 +122,7 @@ class Fluidics(object):
                     else:
                         self.flow(step.port,step.volume,step.speed,step.pause,step.direction)
             else:
-                precise_sleep(60*0.1) # wait 0.5 minutes
+                precise_sleep(1) # wait 0.5 minutes
         self.simulate = False
         self.Protocol.simulate = False
 
