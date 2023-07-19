@@ -36,6 +36,9 @@ class Protocol:
         self.protocols['Gel2Hybe'] = self.Gel2Hybe
         self.protocols['Hybe2Image'] = self.Hybe2Image
         self.protocols['PrepSample'] = self.PrepSample
+        self.protocols['MERFISHVolumeCheck'] = self.MERFISHVolumeCheck
+        self.protocols['dredFISHVolumeCheck'] = self.dredFISHVolumeCheck
+
         
 
     def update_user(self,message,level=20,logger='Protocol'):
@@ -83,6 +86,12 @@ class Protocol:
 
     """ PUT YOUR PROTOCOLS BELOW HERE"""
 
+    def mix(self,chambers,volume):
+        steps = []
+        for chamber in chambers:
+            steps.append(self.replace_volume_single(chamber,chamber,volume,speed=self.speed,pause=0))
+        return pd.concat(steps,ignore_index=True)
+
 
     def reverse_flush(self,Valve_Commands,tube):
         tube,volume = tube.split('+')
@@ -128,11 +137,16 @@ class Protocol:
                 self.primed = True
         steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=self.rinse_time))
         steps.append(self.prime({hybe:''},'Waste+2'))
-        steps.append(self.replace_volume(chambers,hybe,self.hybe_volume,speed=self.speed,pause=wait_time))
+        steps.append(self.replace_volume(chambers,hybe,self.hybe_volume,speed=self.speed,pause=wait_time/4))
+        steps.append(self.mix(chambers,self.hybe_volume))
+        steps.append(self.wait(wait_time/4))
+        steps.append(self.mix(chambers,self.hybe_volume))
+        steps.append(self.wait(wait_time/4))
+        steps.append(self.mix(chambers,self.hybe_volume))
+        steps.append(self.wait(wait_time/4))
         steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=self.rinse_time))
-        steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=self.rinse_time))
-        steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=self.rinse_time))
-        steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=self.rinse_time))
+        steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=0))
+        steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=0))
         return pd.concat(steps,ignore_index=True)
 
     def strip(self,chambers,port):
@@ -145,11 +159,18 @@ class Protocol:
             steps.append(self.prime({'TCEP':'','TBS':'','WBuffer':''},'Waste+2'))
             if not self.simulate:
                 self.primed = True
-        steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=self.rinse_time))
-        steps.append(self.replace_volume(chambers,'TCEP',self.hybe_volume,speed=self.speed,pause=wait_time))
-        steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=self.rinse_time))
-        steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=self.rinse_time))
-        steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=self.rinse_time))
+        steps.append(self.replace_volume(chambers,'TCEP',self.hybe_volume,speed=self.speed,pause=wait_time/4))
+        steps.append(self.mix(chambers,self.hybe_volume))
+        steps.append(self.wait(wait_time/4))
+        steps.append(self.mix(chambers,self.hybe_volume))
+        steps.append(self.wait(wait_time/4))
+        steps.append(self.mix(chambers,self.hybe_volume))
+        steps.append(self.wait(wait_time/4))
+        steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=0))
+        steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=0))
+        steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=0))
+        steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=0))
+        steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=0))
         return pd.concat(steps,ignore_index=True)
     
 
@@ -295,7 +316,33 @@ class Protocol:
         steps.append(self.replace_volume(chambers,'Hybe',0.5,speed=self.speed,pause=36*60*60))
         steps.append(self.Hybe2Image(chambers,other))
         return pd.concat(steps,ignore_index=True)
-
+    
+    def MERFISHVolumeCheck(self,chambers,other):
+        primed = self.primed
+        self.primed = True
+        n_hybes = 19
+        if '+' in other:
+            other,n_hybes = other.split('+')
+            n_hybes = int(n_hybes)
+        steps = []
+        for i in range(n_hybes):
+            steps.append(self.closed_strip_hybe_image(chambers,str(i)))
+        self.primed = primed
+        return pd.concat(steps,ignore_index=True)
+    
+    def dredFISHVolumeCheck(self,chambers,other):
+        primed = self.primed
+        self.primed = True
+        n_hybes = 25
+        if '+' in other:
+            other,n_hybes = other.split('+')
+            n_hybes = int(n_hybes)
+        steps = []
+        for i in range(n_hybes):
+            steps.append(self.strip(chambers,str(i)))
+            steps.append(self.hybe(chambers,str(i)))
+        self.primed = primed
+        return pd.concat(steps,ignore_index=True)
 
 
 
