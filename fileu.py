@@ -81,6 +81,7 @@ def update_user(message,level=20,logger=None):
     print(str(device+' '+datetime.now().strftime("%H:%M:%S"))+' '+message)
 
 def precise_sleep(sleep_time):
-    start = time.perf_counter()
-    while time.perf_counter()-start<sleep_time:
-        pass
+    time.sleep(sleep_time)
+    # start = time.perf_counter()
+    # while time.perf_counter()-start<sleep_time:
+    #     pass
