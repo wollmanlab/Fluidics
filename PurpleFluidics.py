@@ -18,7 +18,7 @@ class PurpleFluidics(Fluidics):
         self.Pump.device = self.device
         self.Valve.device = self.device
         self.Pump.wait_factor = 1/2
-        self.Pump.speed_conversion = 1.9 #s/mL
+        self.Pump.speed_conversion = 1.9*(5/4) #s/mL
         self.Protocol.speed = 1
         self.Protocol.closed_speed = 0.25
         self.Protocol.wait_factor = self.Pump.wait_factor
