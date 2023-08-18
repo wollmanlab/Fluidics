@@ -219,7 +219,7 @@ class Protocol:
         steps.append(self.replace_volume_closed(chambers,'TBS',self.rinse_volume,speed=self.closed_speed,pause=self.rinse_time))
         steps.append(self.replace_volume_closed(chambers,'TBS',self.rinse_volume,speed=self.closed_speed,pause=self.rinse_time))
         steps.append(self.replace_volume_closed(chambers,'IBuffer',self.rinse_volume,speed=self.closed_speed,pause=self.rinse_time))
-        steps.append(self.format(port='Waste',volume=0.4,speed=1,pause=0,direction='Forward'))
+        steps.append(self.format(port='Waste',volume=0.45,speed=1,pause=0,direction='Forward'))
         return pd.concat(steps,ignore_index=True)
     
     def closed_hybe_image(self,chambers,hybe):
