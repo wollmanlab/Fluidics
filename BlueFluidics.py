@@ -39,6 +39,7 @@ class BlueFluidics(Fluidics):
                                 'E':{'valve':3,'port':6},
                                 'F':{'valve':3,'port':7},
                                 'M':{'valve':3,'port':8},
+                                'Air':{'valve':3,'port':9},
                                 'Hybe1':{'valve':1,'port':1},
                                 'Hybe2':{'valve':1,'port':2},
                                 'Hybe3':{'valve':1,'port':3},
