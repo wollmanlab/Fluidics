@@ -55,6 +55,7 @@ class GUI(tk.Frame):
         self.start_button_text = 'Start'
         self.running_label_text = ""
         self.update_label_text = ""
+        self.last_message = ''
 
         
         
@@ -245,7 +246,10 @@ class GUI(tk.Frame):
         while (not ready)|(time.perf_counter()-start>max_wait_time):
             current_message = self.Fluidics.read_communication()
             for message in messages:
-                if message in current_message:
+                if self.last_message != current_message:
+                    self.last_message = current_message
+                    continue
+                elif message in current_message:
                     print(current_message)
                     ready = True
             self.master.update()
