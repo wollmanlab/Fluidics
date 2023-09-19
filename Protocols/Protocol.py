@@ -296,7 +296,7 @@ class Protocol:
             steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=60*5))
         # Buffer Exchange
         for i in range(1):
-            steps.append(self.replace_volume(chambers,'Acrylamide',self.rinse_volume,speed=self.speed,pause=60*5))
+            steps.append(self.replace_volume(chambers,'Gel',self.rinse_volume,speed=self.speed,pause=60*5))
         return pd.concat(steps,ignore_index=True)
 
     def Gel2Hybe(self,chambers,other):
@@ -315,7 +315,7 @@ class Protocol:
                 steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=60*5))
         # Buffer Exchange
         for i in range(1):
-            steps.append(self.replace_volume(chambers,'Formamide',self.rinse_volume,speed=self.speed,pause=60*5))
+            steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=60*5))
         return pd.concat(steps,ignore_index=True)
 
 
@@ -326,7 +326,7 @@ class Protocol:
             steps.append(self.wait(wait_time)) 
         # Wash
         for i in range(3):
-            steps.append(self.replace_volume(chambers,'Formamide',self.rinse_volume,speed=self.speed,pause=60*15))
+            steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=60*15))
         # Buffer Exchange
         for i in range(3):
             steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=60*5))
