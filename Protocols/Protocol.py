@@ -38,6 +38,8 @@ class Protocol:
         self.protocols['PrepSample'] = self.PrepSample
         self.protocols['MERFISHVolumeCheck'] = self.MERFISHVolumeCheck
         self.protocols['dredFISHVolumeCheck'] = self.dredFISHVolumeCheck
+        self.protocols['dend_cycle'] = self.dend_cycle
+        self.protocols['dend_bca'] = self.dend_bca
 
         
 
@@ -98,8 +100,8 @@ class Protocol:
         volume = float(volume)
         steps = []
         for port in Valve_Commands.keys():
-            # if ('ProtK' in port)|('MelphaX' in port):
-            #     steps.append(self.add_liquid(tube,port,float(volume),speed=self.max_speed,pause=0))
+            if 'Vacume' in port:
+                continue
             steps.append(self.add_liquid(tube,port,float(volume),speed=self.max_speed,pause=0))
         return pd.concat(steps,ignore_index=True)
     
@@ -123,6 +125,34 @@ class Protocol:
             steps.append(self.add_liquid(port,tube,volume,speed=self.max_speed,pause=0))
         return pd.concat(steps,ignore_index=True)
 
+    def dend_cycle(self,chambers,hybe):
+        wait_time = 30*60 #always 30 min hybes
+        if '+' in hybe:
+            hybe,wait_time = hybe.split('+')
+            wait_time = 60*int(wait_time) # minutes
+        if not 'Hybe' in hybe:
+            hybe = 'Hybe'+str(hybe)
+        steps = []
+
+        steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=self.rinse_time))
+        steps.append(self.replace_volume(chambers,hybe,self.hybe_volume,speed=self.speed,pause=wait_time))
+
+        steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=0))
+        steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=0))
+        return pd.concat(steps,ignore_index=True)
+    
+    def dend_bca(self,chambers,hybe):
+        steps = []
+        b = self.dend_cycle(chambers, 'Hybe2')
+        c = self.dend_cycle(chambers, 'Hybe3')
+        a = self.dend_cycle(chambers, 'Hybe1')
+
+        steps.append(b)
+        steps.append(c)
+        steps.append(a)
+
+        return pd.concat(steps,ignore_index = True)
+
     def hybe(self,chambers,hybe):
         wait_time = self.hybe_time
         if '+' in hybe:
@@ -144,7 +174,8 @@ class Protocol:
         steps.append(self.wait(wait_time/4))
         steps.append(self.mix(chambers,self.hybe_volume))
         steps.append(self.wait(wait_time/4))
-        steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=self.rinse_time))
+        steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=self.rinse_time*2.5))
+        steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=self.rinse_time*2.5))
         steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=0))
         steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=0))
         return pd.concat(steps,ignore_index=True)
