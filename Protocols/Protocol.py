@@ -100,7 +100,7 @@ class Protocol:
         volume = float(volume)
         steps = []
         for port in Valve_Commands.keys():
-            if 'Vacume' in port:
+            if ('Vacume' in port)|('Air' in port):
                 continue
             steps.append(self.add_liquid(tube,port,float(volume),speed=self.max_speed,pause=0))
         return pd.concat(steps,ignore_index=True)
