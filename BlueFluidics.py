@@ -23,6 +23,7 @@ class BlueFluidics(Fluidics):
         self.Protocol.closed_speed = 0.3
         self.Protocol.rinse_volume = 2
         self.Protocol.hybe_volume = 2
+        self.Protocol.vacume = False
         self.Protocol.wait_factor = self.Pump.wait_factor
         self.Protocol.speed_conversion = self.Pump.speed_conversion
 
