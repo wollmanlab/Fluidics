@@ -23,7 +23,7 @@ class PurpleFluidics(Fluidics):
         self.Protocol.closed_speed = 0.25
         self.Protocol.wait_factor = self.Pump.wait_factor
         self.Protocol.speed_conversion = self.Pump.speed_conversion
-        self.Protocol.vacume = True
+        self.Protocol.vacume = False
         self.Protocol.hybe_time = 10*60
         self.Valve_Commands = {'TBS':{'valve':3,'port':6},
                                 'IBuffer':{'valve':3,'port':9},
