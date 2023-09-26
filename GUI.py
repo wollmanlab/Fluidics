@@ -250,6 +250,7 @@ class GUI(tk.Frame):
                     self.last_message = current_message
                     continue
                 elif message in current_message:
+                    self.last_message = current_message
                     print(current_message)
                     ready = True
             self.master.update()
