@@ -36,6 +36,7 @@ class PurpleFluidics(Fluidics):
                                 'D':{'valve':4,'port':5},
                                 'E':{'valve':4,'port':6},
                                 'F':{'valve':4,'port':7},
+                                'Air':{'valve':4,'port':8},
                                 'Hybe1':{'valve':2,'port':1},
                                 'Hybe2':{'valve':2,'port':2},
                                 'Hybe3':{'valve':2,'port':3},
