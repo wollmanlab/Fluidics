@@ -15,11 +15,11 @@ for handler in logging.root.handlers[:]:
 log_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),'Logs')
 if not os.path.exists(log_path):
     os.mkdir(log_path)
-log_file = os.path.join(log_path,time_stamp+'.log')
-logging.basicConfig(
-                    filename=log_file,filemode='a',
-                    format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
-                    datefmt='%H:%M:%S',level=20)
+# log_file = os.path.join(log_path,time_stamp+'.log')
+# logging.basicConfig(
+#                     filename=log_file,filemode='a',
+#                     format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
+#                     datefmt='%H:%M:%S',level=20)
 
 def update_user(message,level=20,logger=None):
     """
