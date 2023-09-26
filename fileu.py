@@ -12,7 +12,8 @@ time_stamp = str(year)+str(month)+str(day)
 for handler in logging.root.handlers[:]:
     logging.root.removeHandler(handler)
 
-log_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),'Logs')
+# log_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),'Logs')
+log_path = "D:\Images\Fluidics_Logs"
 if not os.path.exists(log_path):
     os.mkdir(log_path)
 # log_file = os.path.join(log_path,time_stamp+'.log')
