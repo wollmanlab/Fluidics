@@ -6,6 +6,7 @@ class Protocol:
         self.protocols = {}
 
         self.simulate = False
+        self.vacume = False
 
         self.chamber_volume = 5
         self.flush_volume = 1.5
