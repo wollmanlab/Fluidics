@@ -283,21 +283,14 @@ class Protocol:
         steps.append(self.replace_volume(chambers,'TPERM',self.rinse_volume,speed=self.speed,pause=60*30))
         # Wash
         for i in range(3):
-            steps.append(self.replace_volume(chambers,'PBS',self.rinse_volume,speed=self.speed,pause=60*5))
-        # Buffer Exchange
-        for i in range(3):
             steps.append(self.replace_volume(chambers,'MOPS',self.rinse_volume,speed=self.speed,pause=60*5))
         # MelphaX
-        steps.append(self.replace_volume(chambers,'MelphaX',self.rinse_volume,speed=self.speed,pause=60*60*16))
+        steps.append(self.replace_volume(chambers,'MelphaX',self.rinse_volume,speed=self.speed,pause=60*60*1))
         # Wash
         for i in range(3):
-            steps.append(self.replace_volume(chambers,'PBS',self.rinse_volume,speed=self.speed,pause=60*5))
-        # Buffer Exchange
-        for i in range(3):
             steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=60*5))
-        # Buffer Exchange
-        for i in range(1):
-            steps.append(self.replace_volume(chambers,'Gel',self.rinse_volume,speed=self.speed,pause=60*5))
+        # Gel
+        steps.append(self.replace_volume(chambers,'Gel',self.rinse_volume,speed=self.speed,pause=0))
         return pd.concat(steps,ignore_index=True)
 
     def Gel2Hybe(self,chambers,other):
@@ -311,12 +304,12 @@ class Protocol:
         # Clearing
         for iter in range(1):
             steps.append(self.replace_volume(chambers,'ProtK',self.rinse_volume,speed=self.speed,pause=60*60*wait_time))
-            # Wash
-            for i in range(3):
-                steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=60*5))
+        # Wash
+        for i in range(3):
+            steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=60*5))
         # Buffer Exchange
         for i in range(1):
-            steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=60*5))
+            steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=60*10))
         return pd.concat(steps,ignore_index=True)
 
 
@@ -332,10 +325,10 @@ class Protocol:
         for i in range(3):
             steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=60*5))
         # Clearing
-        #steps.append(self.replace_volume(chambers,'ProtK',self.rinse_volume,speed=self.speed,pause=60*60*2))
-        # Wash
-        # for i in range(3):
-            # steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=60*5))
+        steps.append(self.replace_volume(chambers,'ProtK',self.rinse_volume,speed=self.speed,pause=60*60*2))
+        #Wash
+        for i in range(3):
+            steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=60*5))
         return pd.concat(steps,ignore_index=True)
     
     
