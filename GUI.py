@@ -243,18 +243,19 @@ class GUI(tk.Frame):
     def wait_until_message(self,messages,max_wait_time=60*5):
         start = time.perf_counter()
         ready = False
+        self.last_message = ''
         while (not ready)|(time.perf_counter()-start>max_wait_time):
             current_message = self.Fluidics.read_communication()
+            if self.last_message == current_message:
+                self.master.update()
+                precise_sleep(0.05)
+                continue
+            print(current_message)
             for message in messages:
-                if self.last_message != current_message:
-                    self.last_message = current_message
-                    continue
-                elif message in current_message:
-                    self.last_message = current_message
+                if message in current_message:
                     print(current_message)
                     ready = True
-            self.master.update()
-            precise_sleep(0.05)
+            self.last_message = current_message
         if (time.perf_counter()-start>max_wait_time):
             raise('Timeout')
 
