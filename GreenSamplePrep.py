@@ -29,6 +29,7 @@ class GreenSamplePrep(Fluidics):
         self.Protocol.wait_factor = self.Pump.wait_factor
         self.Protocol.speed_conversion = self.Pump.speed_conversion
         self.Protocol.rinse_volume = 2
+        self.Protocol.hybe_volume = 2
 
         self.Valve_Commands = {
                                 'A':{'valve':1,'port':1},
