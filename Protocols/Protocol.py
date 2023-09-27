@@ -277,15 +277,15 @@ class Protocol:
     def Storage2Gel(self,chambers,other):
         steps = []
         # Remove From Storage
-        for i in range(3):
-            steps.append(self.replace_volume(chambers,'PBS',self.rinse_volume,speed=self.speed,pause=60*5))
+        for i in range(2):
+            steps.append(self.replace_volume(chambers,'PBS',self.rinse_volume,speed=self.speed,pause=60*10))
         # Permeabilize
         steps.append(self.replace_volume(chambers,'TPERM',self.rinse_volume,speed=self.speed,pause=60*30))
         # Wash
-        for i in range(3):
-            steps.append(self.replace_volume(chambers,'MOPS',self.rinse_volume,speed=self.speed,pause=60*5))
+        for i in range(2):
+            steps.append(self.replace_volume(chambers,'MOPS',self.rinse_volume,speed=self.speed,pause=60*10))
         # MelphaX
-        steps.append(self.replace_volume(chambers,'MelphaX',self.rinse_volume,speed=self.speed,pause=60*60*1))
+        steps.append(self.replace_volume(chambers,'MelphaX',self.hybe_volume,speed=self.speed,pause=60*60*1))
         # Wash
         for i in range(3):
             steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=60*5))
@@ -299,8 +299,8 @@ class Protocol:
             wait_time = int(other.split('+')[-1]) # hours
         steps = []
         # Wash
-        for i in range(3):
-            steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=60*5))
+        for i in range(1):
+            steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=60*10))
         # Clearing
         for iter in range(1):
             steps.append(self.replace_volume(chambers,'ProtK',self.rinse_volume,speed=self.speed,pause=60*60*wait_time))
@@ -319,25 +319,25 @@ class Protocol:
             wait_time = 60*60*int(other.split('+')[-1]) # hours
             steps.append(self.wait(wait_time)) 
         # Wash
-        for i in range(3):
+        for i in range(4):
             steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=60*15))
         # Buffer Exchange
-        for i in range(3):
-            steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=60*5))
+        for i in range(1):
+            steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=60*10))
         # Clearing
         steps.append(self.replace_volume(chambers,'ProtK',self.rinse_volume,speed=self.speed,pause=60*60*2))
         #Wash
         for i in range(3):
-            steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=60*5))
+            steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=60*10))
         return pd.concat(steps,ignore_index=True)
     
     
     def PrepSample(self,chambers,other):
         steps = []
         steps.append(self.Storage2Gel(chambers,other))
-        steps.append(self.replace_volume(chambers,'Gel',3,speed=self.speed,pause=60*60*3))
+        # steps.append(self.replace_volume(chambers,'Gel',3,speed=self.speed,pause=60*60*3))
         steps.append(self.Gel2Hybe(chambers,other))
-        steps.append(self.replace_volume(chambers,'Hybe',0.5,speed=self.speed,pause=36*60*60))
+        # steps.append(self.replace_volume(chambers,'Hybe',0.5,speed=self.speed,pause=36*60*60))
         steps.append(self.Hybe2Image(chambers,other))
         return pd.concat(steps,ignore_index=True)
     
