@@ -16,7 +16,7 @@ for handler in logging.root.handlers[:]:
 log_path = "D:\Images\Fluidics_Logs"
 if not os.path.exists(log_path):
     os.mkdir(log_path)
-# log_file = os.path.join(log_path,time_stamp+'.log')
+# log_file = os.path.join(log_path,time_stamp+'.txt')
 # logging.basicConfig(
 #                     filename=log_file,filemode='a',
 #                     format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
@@ -57,11 +57,11 @@ def update_user(message,level=20,logger=None):
                 logging.root.removeHandler(handler)
 
             logging.basicConfig(
-                        filename=os.path.join(log_path,device+'_'+time_stamp+'.log'),filemode='a',
+                        filename=os.path.join(log_path,device+'_'+time_stamp+'.txt'),filemode='a',
                         format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
                         datefmt='%H:%M:%S',level=20)
             log = logging.getLogger(logger)
-            log.filename = os.path.join(log_path,device+'_'+time_stamp+'.log')
+            log.filename = os.path.join(log_path,device+'_'+time_stamp+'.txt')
         else:
             log = logging.getLogger(logger)
     elif isinstance(logger,type(None)):
