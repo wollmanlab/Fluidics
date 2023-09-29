@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from fileu import *
 class Protocol:
     def __init__(self,gui=False):
@@ -8,7 +9,7 @@ class Protocol:
         self.simulate = False
         self.vacume = False
 
-        self.chamber_volume = 5
+        self.chamber_volume = 3
         self.flush_volume = 1.5
         self.prime_volume = 1
         self.rinse_volume = 3
@@ -66,6 +67,46 @@ class Protocol:
         steps = []
         for chamber in chambers:
             steps.append(self.replace_volume_single(port,chamber,volume,speed=speed,pause=0))
+        expected_time = pd.concat(steps,ignore_index=True)['time_estimate']
+        expected_time =expected_time.sum()-expected_time[0:6].sum()
+        pause = np.max([pause-expected_time,0])
+        steps.append(self.wait(pause))
+        return pd.concat(steps,ignore_index=True)
+    
+    def replace_volume_mix(self,chambers,port,volume,speed=0,pause=0,mixes=0):
+        if speed == 0:
+            speed = self.speed
+        steps = []
+        steps.append(self.replace_volume(chambers,port,volume,speed=speed,pause=0))
+        if mixes>0:
+            steps.append(self.wait(99999))
+            for step in range(mixes):
+                steps.append(self.mix(chambers,self.hybe_volume))
+                steps.append(self.wait(99999))
+            steps = pd.concat(steps,ignore_index=True)
+            time_estimate = steps['time_estimate']
+            pause_estimate = steps['pause']
+            expected_time = np.sum(time_estimate[pause_estimate!=99999])
+            total_pause_time = np.max([pause-expected_time,0])
+            time_estimate[pause_estimate==99999] = 1+total_pause_time/(mixes+1)
+            pause_estimate[pause_estimate==99999] = total_pause_time/(mixes+1)
+            steps['time_estimate'] = time_estimate
+            steps['pause'] = pause_estimate
+            return steps
+        else:
+            steps.append(self.wait(pause))
+            return pd.concat(steps,ignore_index=True)
+
+
+    
+    def add_volume(self,chambers,port,volume,speed=0,pause=0):
+        if speed == 0:
+            speed = self.speed
+        steps = []
+        for chamber in chambers:
+            steps.append(self.add_liquid(port,chamber,volume,speed=speed,pause=0))
+        expected_time = pd.concat(steps,ignore_index=True)['time_estimate'].sum()
+        pause = np.max([pause-expected_time,0])
         steps.append(self.wait(pause))
         return pd.concat(steps,ignore_index=True)
 
@@ -168,13 +209,7 @@ class Protocol:
                 self.primed = True
         steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=self.rinse_time))
         steps.append(self.prime({hybe:''},'Waste+2'))
-        steps.append(self.replace_volume(chambers,hybe,self.hybe_volume,speed=self.speed,pause=wait_time/4))
-        steps.append(self.mix(chambers,self.hybe_volume))
-        steps.append(self.wait(wait_time/4))
-        steps.append(self.mix(chambers,self.hybe_volume))
-        steps.append(self.wait(wait_time/4))
-        steps.append(self.mix(chambers,self.hybe_volume))
-        steps.append(self.wait(wait_time/4))
+        steps.append(self.replace_volume_mix(chambers,hybe,self.hybe_volume,speed=self.speed,pause=wait_time,mixes=3))
         steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=self.rinse_time*2.5))
         steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=self.rinse_time*2.5))
         steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=0))
@@ -191,15 +226,9 @@ class Protocol:
             steps.append(self.prime({'TCEP':'','TBS':'','WBuffer':''},'Waste+2'))
             if not self.simulate:
                 self.primed = True
-        steps.append(self.replace_volume(chambers,'TCEP',self.hybe_volume,speed=self.speed,pause=wait_time/4))
-        steps.append(self.mix(chambers,self.hybe_volume))
-        steps.append(self.wait(wait_time/4))
-        steps.append(self.mix(chambers,self.hybe_volume))
-        steps.append(self.wait(wait_time/4))
-        steps.append(self.mix(chambers,self.hybe_volume))
-        steps.append(self.wait(wait_time/4))
-        steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=0))
-        steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=0))
+        steps.append(self.replace_volume_mix(chambers,'TCEP',self.hybe_volume,speed=self.speed,pause=wait_time,mixes=3))
+        steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=self.rinse_time))
+        steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=self.rinse_time))
         steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=0))
         return pd.concat(steps,ignore_index=True)
     
@@ -286,6 +315,8 @@ class Protocol:
             steps.append(self.replace_volume(chambers,'MOPS',self.rinse_volume,speed=self.speed,pause=60*10))
         # MelphaX
         steps.append(self.replace_volume(chambers,'MelphaX',self.hybe_volume,speed=self.speed,pause=60*60*1))
+
+        # steps.append(self.add_volume(chambers,'Air',self.hybe_volume,speed=self.speed,pause=60*60*1))
         # Wash
         for i in range(3):
             steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=60*5))
