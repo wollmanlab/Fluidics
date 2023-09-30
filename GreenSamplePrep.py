@@ -29,7 +29,8 @@ class GreenSamplePrep(Fluidics):
         self.Protocol.wait_factor = self.Pump.wait_factor
         self.Protocol.speed_conversion = self.Pump.speed_conversion
         self.Protocol.rinse_volume = 2
-        self.Protocol.hybe_volume = 2
+        self.Protocol.hybe_volume = 1
+        self.Protocol.hybe_time = 20*60
 
         self.Valve_Commands = {
                                 'A':{'valve':1,'port':1},
@@ -49,8 +50,8 @@ class GreenSamplePrep(Fluidics):
                                 'MOPS':{'valve':1,'port':15},
                                 'TPERM':{'valve':1,'port':16},
                                 'WBuffer':{'valve':1,'port':17},
-                                'Gel':{'valve':1,'port':18},
-                                'ProtK':{'valve':1,'port':19},
+                                'ProtK':{'valve':1,'port':18},
+                                'Gel':{'valve':1,'port':19},
                                 'MelphaX':{'valve':1,'port':20},
                                 'Ethanol':{'valve':1,'port':21},
                                 'Bleach':{'valve':1,'port':22},
