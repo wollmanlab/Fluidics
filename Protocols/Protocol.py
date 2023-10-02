@@ -25,15 +25,15 @@ class Protocol:
         self.primed = False
 
         self.protocols['Valve'] = self.valve
-        self.protocols['Clean'] = self.clean
+        # self.protocols['Clean'] = self.clean
         self.protocols['Hybe'] = self.hybe
         self.protocols['Strip'] = self.strip
+        self.protocols['ClosedValve'] = self.closed_valve
+        self.protocols['ClosedStripHybeImage'] = self.closed_strip_hybe_image
+        # self.protocols['ClosedHybeImage'] = self.closed_hybe_image
+        # self.protocols['ClosedBubbleRemover'] = self.closed_bubble_remover
         self.protocols['ReverseFlush'] = self.reverse_flush
         self.protocols['Prime'] = self.prime
-        self.protocols['ClosedStripHybeImage'] = self.closed_strip_hybe_image
-        self.protocols['ClosedHybeImage'] = self.closed_hybe_image
-        self.protocols['ClosedValve'] = self.closed_valve
-        self.protocols['ClosedBubbleRemover'] = self.closed_bubble_remover
         self.protocols['Storage2Gel'] = self.Storage2Gel
         self.protocols['Gel2Hybe'] = self.Gel2Hybe
         self.protocols['Hybe2Image'] = self.Hybe2Image
@@ -42,8 +42,6 @@ class Protocol:
         self.protocols['dredFISHVolumeCheck'] = self.dredFISHVolumeCheck
         self.protocols['dend_cycle'] = self.dend_cycle
         self.protocols['dend_bca'] = self.dend_bca
-
-        
 
     def update_user(self,message,level=20,logger='Protocol'):
         logger = self.device +'***' + logger
@@ -96,8 +94,6 @@ class Protocol:
         else:
             steps.append(self.wait(pause))
             return pd.concat(steps,ignore_index=True)
-
-
     
     def add_volume(self,chambers,port,volume,speed=0,pause=0):
         if speed == 0:
@@ -162,8 +158,6 @@ class Protocol:
         volume = float(volume)
         steps = []
         for port in Valve_Commands.keys():
-            # if ('ProtK' in port)|('MelphaX' in port):
-            #     steps.append(self.add_liquid(port,tube,volume,speed=self.max_speed,pause=0))
             steps.append(self.add_liquid(port,tube,volume,speed=self.max_speed,pause=0))
         return pd.concat(steps,ignore_index=True)
 
@@ -210,6 +204,7 @@ class Protocol:
         steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=self.rinse_time))
         steps.append(self.prime({hybe:''},'Waste+2'))
         steps.append(self.replace_volume_mix(chambers,hybe,self.hybe_volume,speed=self.speed,pause=wait_time,mixes=3))
+        steps.append(self.add_liquid('Air',hybe,float(3),speed=self.speed,pause=0)) # Reset Tube to resting state
         steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=self.rinse_time*2.5))
         steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=self.rinse_time*2.5))
         steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=0))
