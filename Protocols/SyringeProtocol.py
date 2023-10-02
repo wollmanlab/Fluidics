@@ -16,6 +16,8 @@ class SyringeProtocol(Protocol):
             if not ((outport=='Waste')|(inport==outport)):
                 steps.append(self.empty_chamber(outport,speed=self.max_speed,pause=0))
                 steps.append(self.wait(1))
+                if 'hybe' in inport.lower():
+                    steps.append(self.wait(5)) # Ensure Accurate Liquid Exchange for Hybe
             steps.append(self.add_liquid(inport,outport,volume,speed=speed,pause=pause))
             steps.append(self.wait(1))
             return pd.concat(steps,ignore_index=True)
