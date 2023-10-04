@@ -71,6 +71,12 @@ class OrangeFluidics(Fluidics):
                                 'IBuffer':{'valve':3,'port':6},
                                 'WBuffer':{'valve':3,'port':7},
                                 'TCEP':{'valve':3,'port':8},
-                                'Valve2':{'valve':3,'port':10}
+                                'Valve2':{'valve':3,'port':10},
+                                'Vacume_A':{'valve':1,'port':2},
+                                'Vacume_B':{'valve':1,'port':3},
+                                'Vacume_C':{'valve':1,'port':4},
+                                'Vacume_D':{'valve':1,'port':5},
+                                'Vacume_E':{'valve':1,'port':6},
+                                'Vacume_F':{'valve':1,'port':7},
                             }
     
