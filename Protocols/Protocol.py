@@ -122,17 +122,23 @@ class Protocol:
         time_estimate = ((float(volume)/float(speed))*self.speed_conversion)+1+float(pause)
         return pd.DataFrame([port,volume,speed,pause,direction,time_estimate],index = ['port','volume','speed','pause','direction','time_estimate']).T
 
-
-
-    """ PUT YOUR PROTOCOLS BELOW HERE"""
-
     def mix(self,chambers,volume):
         steps = []
         for chamber in chambers:
             steps.append(self.replace_volume_single(chamber,chamber,volume,speed=self.speed,pause=0))
         return pd.concat(steps,ignore_index=True)
+    
+    def valve(self,chambers,other):
+        port,volume = other.split('+')
+        volume = float(volume)
+        return self.replace_volume(chambers,port,volume)
 
+    def closed_valve(self,chambers,other):
+        port,volume = other.split('+')
+        volume = float(volume)
+        return self.replace_volume_closed(chambers,port,volume,speed=self.closed_speed)
 
+    """ PUT YOUR PROTOCOLS BELOW HERE"""
     def reverse_flush(self,Valve_Commands,tube):
         tube,volume = tube.split('+')
         volume = float(volume)
@@ -227,16 +233,6 @@ class Protocol:
         steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=0))
         return pd.concat(steps,ignore_index=True)
     
-
-    def valve(self,chambers,other):
-        port,volume = other.split('+')
-        volume = float(volume)
-        return self.replace_volume(chambers,port,volume)
-
-    def closed_valve(self,chambers,other):
-        port,volume = other.split('+')
-        volume = float(volume)
-        return self.replace_volume_closed(chambers,port,volume,speed=self.closed_speed)
     
     def closed_bubble_remover(self,chambers,tube):
         tube  =tube.split('+')[0]
