@@ -23,6 +23,7 @@ class BlueFluidics(Fluidics):
         self.Protocol.closed_speed = 0.3
         self.Protocol.rinse_volume = 2
         self.Protocol.hybe_volume = 2
+        self.Protocol.prime_volume = 3
         self.Protocol.vacume = False
         self.Protocol.wait_factor = self.Pump.wait_factor
         self.Protocol.speed_conversion = self.Pump.speed_conversion
@@ -40,7 +41,7 @@ class BlueFluidics(Fluidics):
                                 'E':{'valve':3,'port':6},
                                 'F':{'valve':3,'port':7},
                                 'M':{'valve':3,'port':8},
-                                'Air':{'valve':3,'port':9},
+                                'Air':{'valve':2,'port':1},
                                 'Hybe1':{'valve':1,'port':1},
                                 'Hybe2':{'valve':1,'port':2},
                                 'Hybe3':{'valve':1,'port':3},
