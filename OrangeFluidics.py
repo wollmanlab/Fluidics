@@ -27,7 +27,7 @@ class OrangeFluidics(Fluidics):
         self.Protocol.rinse_volume = 2
         self.Protocol.hybe_volume = 2
         self.Protocol.rinse_time = 60
-        self.Protocol.hybe_time = 20*60
+        self.Protocol.hybe_time = 10*60
         self.Protocol.vacume = False
         self.Valve_Commands = {
                                 'Waste':{'valve':4,'port':10},
@@ -37,7 +37,7 @@ class OrangeFluidics(Fluidics):
                                 'D':{'valve':4,'port':5},
                                 'E':{'valve':4,'port':6},
                                 'F':{'valve':4,'port':7},
-                                'Air':{'valve':4,'port':8},
+                                'Air':{'valve':3,'port':9},
                                 'Bypass':{'valve':4,'port':1},
                                 'Valve3':{'valve':4,'port':1},
                                 'Hybe1':{'valve':2,'port':1},
@@ -67,6 +67,7 @@ class OrangeFluidics(Fluidics):
                                 'Hybe25':{'valve':3,'port':5},
                                 'Hybe26':{'valve':3,'port':4},
                                 'Hybe27':{'valve':3,'port':3},
+                                'Dapi':{'valve':3,'port':2},
                                 'TBS':{'valve':3,'port':6},
                                 'IBuffer':{'valve':3,'port':6},
                                 'WBuffer':{'valve':3,'port':7},
