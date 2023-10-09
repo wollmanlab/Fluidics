@@ -11,7 +11,7 @@ class Protocol:
 
         self.chamber_volume = 3
         self.flush_volume = 1.5
-        self.prime_volume = 1
+        self.prime_volume = 2
         self.rinse_volume = 3
         self.hybe_volume = 3
 
@@ -204,11 +204,11 @@ class Protocol:
             hybe = 'Hybe'+str(hybe)
         steps = []
         if not self.primed:
-            steps.append(self.prime({'TCEP':'','TBS':'','WBuffer':''},'Waste+2'))
+            steps.append(self.prime({'TCEP':'','TBS':'','WBuffer':''},'Waste+'+str(self.prime_volume)))
             if not self.simulate:
                 self.primed = True
         steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=self.rinse_time))
-        steps.append(self.prime({hybe:''},'Waste+2'))
+        steps.append(self.prime({hybe:''},'Waste+'+str(self.prime_volume)))
         steps.append(self.replace_volume_mix(chambers,hybe,self.hybe_volume,speed=self.speed,pause=wait_time,mixes=3))
         steps.append(self.add_liquid('Air',hybe,float(3),speed=self.speed,pause=0)) # Reset Tube to resting state
         steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=self.rinse_time*2.5))
@@ -224,7 +224,7 @@ class Protocol:
             wait_time = 60*int(wait_time) # minutes
         steps = []
         if not self.primed:
-            steps.append(self.prime({'TCEP':'','TBS':'','WBuffer':''},'Waste+2'))
+            steps.append(self.prime({'TCEP':'','TBS':'','WBuffer':''},'Waste+'+str(self.prime_volume)))
             if not self.simulate:
                 self.primed = True
         steps.append(self.replace_volume_mix(chambers,'TCEP',self.hybe_volume,speed=self.speed,pause=wait_time,mixes=3))
