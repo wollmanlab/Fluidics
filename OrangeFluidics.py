@@ -30,6 +30,7 @@ class OrangeFluidics(Fluidics):
         self.Protocol.hybe_time = 10*60
         self.Protocol.prime_volume = 3
         self.Protocol.vacume = False
+        self.Protocol.vacume = True
         self.Valve_Commands = {
                                 'Waste':{'valve':4,'port':10},
                                 'A':{'valve':4,'port':2},
@@ -80,5 +81,6 @@ class OrangeFluidics(Fluidics):
                                 'Vacume_D':{'valve':1,'port':5},
                                 'Vacume_E':{'valve':1,'port':6},
                                 'Vacume_F':{'valve':1,'port':7},
+                                'Vacume_Waste':{'valve':1,'port':10},
                             }
     
