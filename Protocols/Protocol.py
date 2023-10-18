@@ -27,6 +27,7 @@ class Protocol:
         self.protocols['Valve'] = self.valve
         # self.protocols['Clean'] = self.clean
         self.protocols['Hybe'] = self.hybe
+        self.protocols['FormamideStrip'] = self.formamide_strip
         self.protocols['Strip'] = self.strip
         self.protocols['ClosedValve'] = self.closed_valve
         self.protocols['ClosedStripHybeImage'] = self.closed_strip_hybe_image
@@ -228,6 +229,24 @@ class Protocol:
             if not self.simulate:
                 self.primed = True
         steps.append(self.replace_volume_mix(chambers,'TCEP',self.hybe_volume,speed=self.speed,pause=wait_time,mixes=3))
+        steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=self.rinse_time*2.5))
+        steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=self.rinse_time*2.5))
+        steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=0))
+        return pd.concat(steps,ignore_index=True)
+    
+    def formamide_strip(self,chambers,port):
+        wait_time = self.hybe_time
+        if '+' in port:
+            port,wait_time = port.split('+')
+            wait_time = 60*int(wait_time) # minutes
+        steps = []
+        if not self.primed:
+            steps.append(self.prime({'TCEP':'','TBS':'','WBuffer':''},'Waste+'+str(self.prime_volume)))
+            if not self.simulate:
+                self.primed = True
+        n = 3
+        for i in range(n):
+            steps.append(self.replace_volume_mix(chambers,'TCEP',self.hybe_volume,speed=self.speed,pause=wait_time/n,mixes=3))
         steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=self.rinse_time*2.5))
         steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=self.rinse_time*2.5))
         steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=0))
