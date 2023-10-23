@@ -41,8 +41,8 @@ class Protocol:
         self.protocols['PrepSample'] = self.PrepSample
         self.protocols['MERFISHVolumeCheck'] = self.MERFISHVolumeCheck
         self.protocols['dredFISHVolumeCheck'] = self.dredFISHVolumeCheck
-        self.protocols['dend_cycle'] = self.dend_cycle
-        self.protocols['dend_bca'] = self.dend_bca
+        self.protocols['dendcycle'] = self.dendcycle
+        self.protocols['dendbca'] = self.dendbca
 
     def update_user(self,message,level=20,logger='Protocol'):
         logger = self.device +'***' + logger
@@ -168,8 +168,8 @@ class Protocol:
             steps.append(self.add_liquid(port,tube,volume,speed=self.max_speed,pause=0))
         return pd.concat(steps,ignore_index=True)
 
-    def dend_cycle(self,chambers,hybe):
-        wait_time = 30*60 #always 30 min hybes
+    def dendcycle(self,chambers,hybe):
+        wait_time = 60*60 #always 30 min hybes
         if '+' in hybe:
             hybe,wait_time = hybe.split('+')
             wait_time = 60*int(wait_time) # minutes
@@ -177,18 +177,20 @@ class Protocol:
             hybe = 'Hybe'+str(hybe)
         steps = []
 
-        steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=self.rinse_time))
+        steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=self.rinse_time))
         steps.append(self.replace_volume(chambers,hybe,self.hybe_volume,speed=self.speed,pause=wait_time))
 
+        steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=self.rinse_time))
+        steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=self.rinse_time))
         steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=0))
         steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=0))
         return pd.concat(steps,ignore_index=True)
     
-    def dend_bca(self,chambers,hybe):
+    def dendbca(self,chambers,hybe):
         steps = []
-        b = self.dend_cycle(chambers, 'Hybe2')
-        c = self.dend_cycle(chambers, 'Hybe3')
-        a = self.dend_cycle(chambers, 'Hybe1')
+        b = self.dendcycle(chambers, 'Hybe2')
+        c = self.dendcycle(chambers, 'Hybe3')
+        a = self.dendcycle(chambers, 'Hybe1')
 
         steps.append(b)
         steps.append(c)
