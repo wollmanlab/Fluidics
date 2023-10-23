@@ -27,7 +27,7 @@ class OrangeFluidics(Fluidics):
         self.Protocol.rinse_volume = 2
         self.Protocol.hybe_volume = 2
         self.Protocol.rinse_time = 60
-        self.Protocol.hybe_time = 10*60
+        self.Protocol.hybe_time = 20*60
         self.Protocol.prime_volume = 3
         self.Protocol.vacume = False
         self.Protocol.vacume = True
