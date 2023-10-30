@@ -40,7 +40,6 @@ class OrangeFluidics(Fluidics):
                                 'E':{'valve':4,'port':6},
                                 'F':{'valve':4,'port':7},
                                 'Air':{'valve':3,'port':9},
-                                'Bypass':{'valve':4,'port':1},
                                 'Valve3':{'valve':4,'port':1},
                                 'Hybe1':{'valve':2,'port':1},
                                 'Hybe2':{'valve':2,'port':2},
