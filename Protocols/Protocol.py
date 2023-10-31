@@ -64,8 +64,16 @@ class Protocol:
         if speed == 0:
             speed = self.speed
         steps = []
-        for chamber in chambers:
-            steps.append(self.replace_volume_single(port,chamber,volume,speed=speed,pause=0))
+        if self.vacume:
+            # Empty Wells First
+            for chamber in chambers:
+                steps.append(self.empty_chamber(chamber,volume=volume,speed=speed,pause=0))
+            steps.append(self.empty_chamber('Waste',volume=0,speed=0,pause=0))
+            for chamber in chambers:
+                steps.append(self.add_liquid(port,chamber,volume,speed=speed,pause=0))
+        else:
+            for chamber in chambers:
+                steps.append(self.replace_volume_single(port,chamber,volume,speed=speed,pause=0))
         expected_time = pd.concat(steps,ignore_index=True)['time_estimate']
         expected_time =expected_time.sum()-expected_time[0:6].sum()
         pause = np.max([pause-expected_time,0])
