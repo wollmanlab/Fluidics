@@ -64,12 +64,19 @@ class SyringeProtocol(Protocol):
         steps.append(self.add_liquid(inport,outport,volume,speed=speed,pause=pause))
         return pd.concat(steps,ignore_index=True)
 
-    def empty_chamber(self,chamber,speed=0,pause=0):
+    def empty_chamber(self,chamber,volume=5,speed=0,pause=0):
         if speed == 0:
             speed = self.speed
         steps = []
-        steps.append(self.format(port=chamber,volume=self.chamber_volume,speed=self.max_speed ,pause=pause,direction='Reverse'))
-        steps.append(self.format(port='Waste',volume=self.chamber_volume,speed=self.max_speed ,pause=pause,direction='Forward'))
+        if self.vacume:
+            # determine Vacume Port
+            vacume_chamber = 'Vacume_'+chamber
+            # Set Vacume To Chamber
+            steps.append(self.format(port=vacume_chamber,volume=volume,speed=self.speed ,pause=0,direction='None'))
+            steps.append(self.wait(1))
+        else:
+            steps.append(self.format(port=chamber,volume=self.chamber_volume,speed=self.max_speed ,pause=pause,direction='Reverse'))
+            steps.append(self.format(port='Waste',volume=self.chamber_volume,speed=self.max_speed ,pause=pause,direction='Forward'))
         return pd.concat(steps,ignore_index=True)
 
     def add_liquid(self,port,chamber,volume,speed=0,pause=0):
