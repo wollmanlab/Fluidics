@@ -18,12 +18,13 @@ class PurpleFluidics(Fluidics):
         self.Pump.device = self.device
         self.Valve.device = self.device
         self.Pump.wait_factor = 1/2
+        self.Protocol.chamber_volume = 5
         self.Pump.speed_conversion = 1.9*(5/4) #s/mL
         self.Protocol.speed = 1
         self.Protocol.closed_speed = 0.25
         self.Protocol.wait_factor = self.Pump.wait_factor
         self.Protocol.speed_conversion = self.Pump.speed_conversion
-        self.Protocol.vacume = False
+        self.Protocol.vacume = True
         self.Protocol.hybe_time = 10*60
         self.Valve_Commands = {'TBS':{'valve':3,'port':6},
                                 'IBuffer':{'valve':3,'port':9},
@@ -37,7 +38,7 @@ class PurpleFluidics(Fluidics):
                                 'E':{'valve':4,'port':6},
                                 'F':{'valve':4,'port':7},
                                 'Air':{'valve':3,'port':10},
-                                'DAPI':{'valve':3,'port':2},
+                                'Dapi':{'valve':3,'port':2},
                                 'Hybe1':{'valve':2,'port':1},
                                 'Hybe2':{'valve':2,'port':2},
                                 'Hybe3':{'valve':2,'port':3},
@@ -73,4 +74,5 @@ class PurpleFluidics(Fluidics):
                                 'Vacume_D':{'valve':1,'port':5},
                                 'Vacume_E':{'valve':1,'port':6},
                                 'Vacume_F':{'valve':1,'port':7},
+                                'Vacume_Waste':{'valve':1,'port':10},
                             }
