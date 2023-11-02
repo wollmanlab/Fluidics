@@ -43,6 +43,7 @@ class Protocol:
         self.protocols['dredFISHVolumeCheck'] = self.dredFISHVolumeCheck
         self.protocols['dendcycle'] = self.dendcycle
         self.protocols['dendbca'] = self.dendbca
+        self.protocols['blankprotocol'] = self.blankprotocol
 
     def update_user(self,message,level=20,logger='Protocol'):
         logger = self.device +'***' + logger
@@ -196,6 +197,12 @@ class Protocol:
         steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=0))
         return pd.concat(steps,ignore_index=True)
     
+    def blankprotocol(self,chambers,hybe):
+        steps = []
+        steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=self.rinse_time))
+        return pd.concat(steps,ignore_index=True)
+
+
     def dendbca(self,chambers,hybe):
         steps = []
         b = self.dendcycle(chambers, 'Hybe2')
