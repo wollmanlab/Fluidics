@@ -84,7 +84,9 @@ class SyringeProtocol(Protocol):
             speed = self.speed
         steps = []
         steps.append(self.format(port=port,volume=volume,speed=self.max_speed ,pause=0,direction='Reverse'))
+        # steps.append(self.format(port='Air',volume=1,speed=self.max_speed ,pause=0,direction='Reverse'))
         if 'hybe' in port.lower():
             steps.append(self.wait(5)) # Ensure Accurate Liquid Exchange for Hybe
         steps.append(self.format(port=chamber,volume=volume,speed=speed,pause=pause,direction='Forward'))
+        # steps.append(self.format(port=chamber,volume=1,speed=speed,pause=pause,direction='Forward'))
         return pd.concat(steps,ignore_index=True)
