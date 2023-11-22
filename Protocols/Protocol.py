@@ -44,6 +44,7 @@ class Protocol:
         self.protocols['dendcycle'] = self.dendcycle
         self.protocols['dendbca'] = self.dendbca
         self.protocols['blankprotocol'] = self.blankprotocol
+        self.protocols['bdna'] = self.bdna
 
     def update_user(self,message,level=20,logger='Protocol'):
         logger = self.device +'***' + logger
@@ -199,8 +200,8 @@ class Protocol:
     
     def blankprotocol(self,chambers,hybe):
         steps = []
-        steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=self.rinse_time))
-        return pd.concat(steps,ignore_index=True)
+        #steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=self.rinse_time))
+        return steps
 
 
     def dendbca(self,chambers,hybe):
@@ -214,7 +215,43 @@ class Protocol:
         steps.append(a)
 
         return pd.concat(steps,ignore_index = True)
+    
+    def bdna(self,chambers,hybe):
+        wait_time = 60*60
+        if '+' in hybe:
+            hybe,wait_time = hybe.split('+')
+            wait_time = 60*int(wait_time) # minutes
+        hybe = 'Hybe26'
+        steps = []
+        if not self.primed:
+            steps.append(self.prime({'TCEP':'','TBS':'','WBuffer':''},'Waste+'+str(self.prime_volume)))
+            if not self.simulate:
+                self.primed = True
+        steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=self.rinse_time))
+        steps.append(self.prime({hybe:''},'Waste+'+str(self.prime_volume)))
+        steps.append(self.replace_volume_mix(chambers,hybe,self.hybe_volume,speed=self.speed,pause=wait_time,mixes=3))
+        steps.append(self.add_liquid('Air',hybe,float(3),speed=self.speed,pause=0)) # Reset Tube to resting state
+        steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=self.rinse_time*2.5))
+        steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=self.rinse_time*2.5))
+        steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=0))
+        steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=0))
+        pd.concat(steps,ignore_index=True)
 
+        hybe = 'Hybe27'
+        if not self.primed:
+            steps.append(self.prime({'TCEP':'','TBS':'','WBuffer':''},'Waste+'+str(self.prime_volume)))
+            if not self.simulate:
+                self.primed = True
+        steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=self.rinse_time))
+        steps.append(self.prime({hybe:''},'Waste+'+str(self.prime_volume)))
+        steps.append(self.replace_volume_mix(chambers,hybe,self.hybe_volume,speed=self.speed,pause=wait_time,mixes=3))
+        steps.append(self.add_liquid('Air',hybe,float(3),speed=self.speed,pause=0)) # Reset Tube to resting state
+        steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=self.rinse_time*2.5))
+        steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=self.rinse_time*2.5))
+        steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=0))
+        steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=0))
+        return pd.concat(steps,ignore_index=True)
+    
     def hybe(self,chambers,hybe):
         wait_time = self.hybe_time
         if '+' in hybe:
