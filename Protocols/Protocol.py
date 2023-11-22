@@ -16,7 +16,7 @@ class Protocol:
         self.hybe_volume = 3
 
         self.rinse_time = 60
-        self.hybe_time = 600
+        self.hybe_time = 600*3
         self.max_speed = 1
         self.speed = 1
         self.closed_speed = 0.3
@@ -44,6 +44,9 @@ class Protocol:
         self.protocols['dendcycle'] = self.dendcycle
         self.protocols['dendbca'] = self.dendbca
         self.protocols['blankprotocol'] = self.blankprotocol
+        self.protocols['bdna'] = self.bdna
+        self.protocols['dendcyclegradient'] = self.dendcyclegradient
+        self.protocols['dendgradient'] = self.dendgradient
 
     def update_user(self,message,level=20,logger='Protocol'):
         logger = self.device +'***' + logger
@@ -197,10 +200,32 @@ class Protocol:
         steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=0))
         return pd.concat(steps,ignore_index=True)
     
+    def dendcyclegradient(self,chambers,hybe):
+        wait_time = 60*60 #always 30 min hybes
+        if '+' in hybe:
+            hybe,wait_time = hybe.split('+')
+            wait_time = 60*int(wait_time) # minutes
+        steps = []
+
+        steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=self.rinse_time))
+
+        steps.append(self.replace_volume('A', str('Hybe' + str(1*int(hybe)+0)),self.hybe_volume,speed=self.speed,pause=0))
+        steps.append(self.replace_volume('B',str('Hybe' + str(1*int(hybe)+3)),self.hybe_volume,speed=self.speed,pause=0))
+        steps.append(self.replace_volume('C',str('Hybe' + str(1*int(hybe)+6)),self.hybe_volume,speed=self.speed,pause=0))
+        steps.append(self.replace_volume("D",str('Hybe' + str(1*int(hybe)+9)),self.hybe_volume,speed=self.speed,pause=0))
+        steps.append(self.replace_volume('E',str('Hybe' + str(1*int(hybe)+12)),self.hybe_volume,speed=self.speed,pause=0))
+        steps.append(self.replace_volume('F',str('Hybe' + str(1*int(hybe)+15)),self.hybe_volume,speed=self.speed,pause=wait_time))
+
+        steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=self.rinse_time))
+        steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=self.rinse_time))
+        steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=0))
+        steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=0))
+        return pd.concat(steps,ignore_index=True)
+    
     def blankprotocol(self,chambers,hybe):
         steps = []
-        steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=self.rinse_time))
-        return pd.concat(steps,ignore_index=True)
+        #steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=self.rinse_time))
+        return steps
 
 
     def dendbca(self,chambers,hybe):
@@ -214,6 +239,63 @@ class Protocol:
         steps.append(a)
 
         return pd.concat(steps,ignore_index = True)
+    
+    def dendgradient(self,chambers,hybe):
+        steps = []
+        b = self.dendcyclegradient(chambers, '2')
+        c = self.dendcyclegradient(chambers, '3')
+        a = self.dendcyclegradient(chambers, '1')
+
+        steps.append(a)
+        steps.append(b)
+        steps.append(c)
+
+        return pd.concat(steps,ignore_index = True)
+    
+    
+
+    def bdna(self,chambers,hybe):
+        self.hybe_time = 600*6
+        wait_time = self.hybe_time
+        if '+' in hybe:
+            hybe,wait_time = hybe.split('+')
+            wait_time = 60*int(wait_time) # minutes
+        if not 'Hybe' in hybe:
+            hybe = 'Hybe'+str(hybe)
+        steps = []
+
+        print(self.hybe_time)
+        hybe = 'Hybe26'
+
+        if not self.primed:
+            steps.append(self.prime({'TCEP':'','TBS':'','WBuffer':''},'Waste+'+str(self.prime_volume)))
+            if not self.simulate:
+                self.primed = True
+        steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=self.rinse_time))
+        steps.append(self.prime({hybe:''},'Waste+'+str(self.prime_volume)))
+        steps.append(self.replace_volume_mix(chambers,hybe,self.hybe_volume,speed=self.speed,pause=wait_time,mixes=3))
+        steps.append(self.add_liquid('Air',hybe,float(3),speed=self.speed,pause=0)) # Reset Tube to resting state
+        steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=self.rinse_time*2.5))
+        steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=self.rinse_time*2.5))
+        steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=0))
+        steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=0))
+        pd.concat(steps,ignore_index=True)
+    
+        hybe = 'Hybe27'
+
+        if not self.primed:
+            steps.append(self.prime({'TCEP':'','TBS':'','WBuffer':''},'Waste+'+str(self.prime_volume)))
+            if not self.simulate:
+                self.primed = True
+        steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=self.rinse_time))
+        steps.append(self.prime({hybe:''},'Waste+'+str(self.prime_volume)))
+        steps.append(self.replace_volume_mix(chambers,hybe,self.hybe_volume,speed=self.speed,pause=wait_time,mixes=3))
+        steps.append(self.add_liquid('Air',hybe,float(3),speed=self.speed,pause=0)) # Reset Tube to resting state
+        steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=self.rinse_time*2.5))
+        steps.append(self.replace_volume(chambers,'WBuffer',self.rinse_volume,speed=self.speed,pause=self.rinse_time*2.5))
+        steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=0))
+        steps.append(self.replace_volume(chambers,'TBS',self.rinse_volume,speed=self.speed,pause=0))
+        return pd.concat(steps,ignore_index=True)
 
     def hybe(self,chambers,hybe):
         wait_time = self.hybe_time
