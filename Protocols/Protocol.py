@@ -16,7 +16,7 @@ class Protocol:
         self.hybe_volume = 3
 
         self.rinse_time = 60
-        self.hybe_time = 600*3
+        self.hybe_time = 600
         self.max_speed = 1
         self.speed = 1
         self.closed_speed = 0.3
@@ -361,7 +361,7 @@ class Protocol:
         steps.append(self.replace_volume_closed(chambers,'TBS',self.rinse_volume,speed=self.closed_speed,pause=self.rinse_time))
         steps.append(self.replace_volume_closed(chambers,'WBuffer',self.rinse_volume,speed=self.closed_speed,pause=self.rinse_time))
         steps.append(self.prime({hybe:''},'Waste+2'))
-        steps.append(self.replace_volume_closed(chambers,hybe,self.hybe_volume,speed=self.closed_speed,pause=2*self.hybe_time,n_steps=3))
+        steps.append(self.replace_volume_closed(chambers,hybe,self.hybe_volume,speed=self.closed_speed,pause=self.hybe_time,n_steps=3))
         steps.append(self.replace_volume_closed(chambers,'WBuffer',self.rinse_volume,speed=self.closed_speed,pause=self.rinse_time))
         steps.append(self.replace_volume_closed(chambers,'WBuffer',self.rinse_volume,speed=self.closed_speed,pause=self.rinse_time))
         steps.append(self.replace_volume_closed(chambers,'TBS',self.rinse_volume,speed=self.closed_speed,pause=self.rinse_time))
