@@ -68,6 +68,7 @@ class OrangeFluidics(Fluidics):
                                 'Hybe25':{'valve':3,'port':5},
                                 'Hybe26':{'valve':3,'port':4},
                                 'Hybe27':{'valve':3,'port':3},
+                                'Hybe28':{'valve':3,'port':2},
                                 'Dapi':{'valve':3,'port':2},
                                 'TBS':{'valve':3,'port':6},
                                 'IBuffer':{'valve':3,'port':6},
