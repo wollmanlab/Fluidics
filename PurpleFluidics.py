@@ -18,15 +18,22 @@ class PurpleFluidics(Fluidics):
         self.Pump.device = self.device
         self.Valve.device = self.device
         self.Pump.wait_factor = 1/2
-        self.Protocol.chamber_volume = 5
         self.Pump.speed_conversion = 1.9*(5/4) #s/mL
         self.Protocol.speed = 1
         self.Protocol.closed_speed = 0.25
         self.Protocol.wait_factor = self.Pump.wait_factor
         self.Protocol.speed_conversion = self.Pump.speed_conversion
+        self.Protocol.chamber_volume = 5
+        self.Protocol.rinse_volume = 2
+        self.Protocol.hybe_volume = 2
+        self.Protocol.rinse_time = 60
+        self.Protocol.hybe_time = 20*60
+        self.Protocol.prime_volume = 3
         self.Protocol.vacume = True
-        self.Protocol.hybe_time = 10*60
-        self.Valve_Commands = {'TBS':{'valve':3,'port':6},
+        self.Valve_Commands = {'Dapi':{'valve':3,'port':2},
+                                'TBS':{'valve':3,'port':6},
+                               'HybeTBS':{'valve':3,'port':6},
+                               'StripTBS':{'valve':3,'port':9},
                                 'IBuffer':{'valve':3,'port':9},
                                 'WBuffer':{'valve':3,'port':7},
                                 'TCEP':{'valve':3,'port':8},
@@ -37,8 +44,7 @@ class PurpleFluidics(Fluidics):
                                 'D':{'valve':4,'port':5},
                                 'E':{'valve':4,'port':6},
                                 'F':{'valve':4,'port':7},
-                                'Air':{'valve':3,'port':10},
-                                'Dapi':{'valve':3,'port':2},
+                                'Air':{'valve':4,'port':9},
                                 'Hybe1':{'valve':2,'port':1},
                                 'Hybe2':{'valve':2,'port':2},
                                 'Hybe3':{'valve':2,'port':3},
@@ -66,8 +72,7 @@ class PurpleFluidics(Fluidics):
                                 'Hybe25':{'valve':3,'port':5},
                                 'Hybe26':{'valve':3,'port':4},
                                 'Hybe27':{'valve':3,'port':3},
-                                'Valve2':{'valve':3,'port':1},
-                                'Valve3':{'valve':4,'port':1},
+                                'Hybe28':{'valve':3,'port':2},
                                 'Vacume_A':{'valve':1,'port':2},
                                 'Vacume_B':{'valve':1,'port':3},
                                 'Vacume_C':{'valve':1,'port':4},
@@ -75,4 +80,6 @@ class PurpleFluidics(Fluidics):
                                 'Vacume_E':{'valve':1,'port':6},
                                 'Vacume_F':{'valve':1,'port':7},
                                 'Vacume_Waste':{'valve':1,'port':10},
+                                'Valve2':{'valve':3,'port':1},
+                                'Valve3':{'valve':4,'port':1},
                             }
