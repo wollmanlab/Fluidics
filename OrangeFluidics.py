@@ -29,9 +29,14 @@ class OrangeFluidics(Fluidics):
         self.Protocol.rinse_time = 60
         self.Protocol.hybe_time = 20*60
         self.Protocol.prime_volume = 3
-        self.Protocol.vacume = False
         self.Protocol.vacume = True
-        self.Valve_Commands = {
+        self.Valve_Commands = {'Dapi':{'valve':3,'port':2},
+                                'TBS':{'valve':3,'port':6},
+                                'HybeTBS':{'valve':3,'port':6},
+                                'StripTBS':{'valve':3,'port':9},
+                                'IBuffer':{'valve':3,'port':9},
+                                'WBuffer':{'valve':3,'port':7},
+                                'TCEP':{'valve':3,'port':8},
                                 'Waste':{'valve':4,'port':10},
                                 'A':{'valve':4,'port':2},
                                 'B':{'valve':4,'port':3},
@@ -39,8 +44,7 @@ class OrangeFluidics(Fluidics):
                                 'D':{'valve':4,'port':5},
                                 'E':{'valve':4,'port':6},
                                 'F':{'valve':4,'port':7},
-                                'Air':{'valve':4,'port':9}, 
-                                'Valve3':{'valve':4,'port':1},
+                                'Air':{'valve':4,'port':9},
                                 'Hybe1':{'valve':2,'port':1},
                                 'Hybe2':{'valve':2,'port':2},
                                 'Hybe3':{'valve':2,'port':3},
@@ -69,15 +73,6 @@ class OrangeFluidics(Fluidics):
                                 'Hybe26':{'valve':3,'port':4},
                                 'Hybe27':{'valve':3,'port':3},
                                 'Hybe28':{'valve':3,'port':2},
-                                'WBuffer2':{'valve':3,'port':1},
-                                'Dapi':{'valve':3,'port':2},
-                                'TBS':{'valve':3,'port':6},
-                                'HybeTBS':{'valve':3,'port':6},
-                                'StripTBS':{'valve':3,'port':9},
-                                'IBuffer':{'valve':3,'port':6},
-                                'WBuffer':{'valve':3,'port':7},
-                                'TCEP':{'valve':3,'port':8},
-                                'Valve2':{'valve':3,'port':10},
                                 'Vacume_A':{'valve':1,'port':2},
                                 'Vacume_B':{'valve':1,'port':3},
                                 'Vacume_C':{'valve':1,'port':4},
@@ -85,5 +80,7 @@ class OrangeFluidics(Fluidics):
                                 'Vacume_E':{'valve':1,'port':6},
                                 'Vacume_F':{'valve':1,'port':7},
                                 'Vacume_Waste':{'valve':1,'port':10},
+                                'Valve2':{'valve':3,'port':10},
+                                'Valve3':{'valve':4,'port':1},
                             }
     
