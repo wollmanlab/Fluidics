@@ -25,7 +25,7 @@ class Protocol:
         self.primed = False
 
         self.protocols['Valve'] = self.valve
-        # self.protocols['Clean'] = self.clean
+        self.protocols['Clean'] = self.clean
         self.protocols['Hybe'] = self.hybe
         self.protocols['EncodingHybe'] = self.encoding_hybe
         self.protocols['FormamideStrip'] = self.formamide_strip
@@ -165,10 +165,12 @@ class Protocol:
     
     def clean(self,Valve_Commands,tube):
         steps = []
+        if not '+' in tube:
+            tube = tube+'+5'
         steps.append(self.reverse_flush(Valve_Commands,tube))
-        steps.append(self.wait(60*5)) #5 min
-        steps.append(self.prime(Valve_Commands,tube.split('+')[0]+'+5'))
-
+        steps.append(self.prime(Valve_Commands,tube))
+        steps.append(self.reverse_flush(Valve_Commands,'Air+3'))
+        steps.append(self.reverse_flush(Valve_Commands,'Air+3'))
         return pd.concat(steps,ignore_index=True)
 
     def prime(self,Valve_Commands,tube):
