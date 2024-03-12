@@ -32,7 +32,8 @@ class Protocol:
         self.protocols['Strip'] = self.strip
         self.protocols['ClosedValve'] = self.closed_valve
         self.protocols['ClosedStripHybeImage'] = self.closed_strip_hybe_image
-        # self.protocols['ClosedHybeImage'] = self.closed_hybe_image
+        self.protocols['ClosedStripImage'] = self.closed_strip_image
+        self.protocols['ClosedHybeImage'] = self.closed_hybe_image
         # self.protocols['ClosedBubbleRemover'] = self.closed_bubble_remover
         self.protocols['ReverseFlush'] = self.reverse_flush
         self.protocols['Prime'] = self.prime
@@ -40,6 +41,7 @@ class Protocol:
         self.protocols['Gel2Hybe'] = self.Gel2Hybe
         self.protocols['Hybe2Image'] = self.Hybe2Image
         self.protocols['PrepSample'] = self.PrepSample
+        self.protocols['MERFISHStripVolumeCheck'] = self.MERFISHStripVolumeCheck
         self.protocols['MERFISHVolumeCheck'] = self.MERFISHVolumeCheck
         self.protocols['dredFISHVolumeCheck'] = self.dredFISHVolumeCheck
         self.protocols['dendcycle'] = self.dendcycle
@@ -153,6 +155,24 @@ class Protocol:
         return self.replace_volume_closed(chambers,port,volume,speed=self.closed_speed)
 
     """ PUT YOUR PROTOCOLS BELOW HERE"""
+    def mineral(self,volume):
+        # if '+' in tube:
+        #     tube,volume  =tube.split('+')
+        #     volume = float(volume)
+        steps = []
+        steps.append(self.format(port='MOil',volume=self.rinse_volume/2,speed=self.closed_speed*2,pause=10,direction='Reverse'))
+        steps.append(self.format(port='IBuffer',volume=self.rinse_volume/2,speed=self.max_speed,pause=0,direction='Forward'))
+        steps.append(self.format(port='IBuffer',volume=volume+self.rinse_volume+self.closed_volume_buffer,speed=self.closed_speed,pause=30,direction='Reverse'))
+        steps.append(self.format(port='M',volume=self.rinse_volume,speed=self.closed_speed,pause=0,direction='Forward'))
+        steps.append(self.format(port='Air',volume=self.rinse_volume,speed=self.max_speed,pause=0,direction='Reverse'))
+        steps.append(self.format(port='Waste',volume=volume+self.rinse_volume+self.closed_volume_buffer,speed=self.max_speed,pause=5,direction='Forward'))
+        n = 3
+        for i in range(n):
+            steps.append(self.format(port='TBS',volume=self.rinse_volume,speed=self.max_speed,pause=5,direction='Reverse'))
+            steps.append(self.format(port='Waste',volume=self.rinse_volume,speed=self.max_speed,pause=5,direction='Forward'))
+        return pd.concat(steps,ignore_index=True) 
+    
+
     def reverse_flush(self,Valve_Commands,tube):
         tube,volume = tube.split('+')
         volume = float(volume)
@@ -380,6 +400,23 @@ class Protocol:
         return pd.concat(steps,ignore_index=True)
 
 
+    def closed_strip_image(self,chambers,hybe):
+        if not 'Hybe' in hybe:
+            hybe = 'Hybe'+hybe
+        steps = []
+        if not self.primed:
+            steps.append(self.prime({'TCEP':'','TBS':'','WBuffer':'','IBuffer':''},'Waste+2'))
+            if not self.simulate:
+                self.primed = True
+        steps.append(self.replace_volume_closed(chambers,'TBS',self.rinse_volume,speed=self.closed_speed,pause=self.rinse_time))
+        steps.append(self.replace_volume_closed(chambers,'TCEP',self.hybe_volume,speed=self.closed_speed,pause=self.hybe_time,n_steps=3))
+        steps.append(self.replace_volume_closed(chambers,'TBS',self.rinse_volume,speed=self.closed_speed,pause=self.rinse_time))
+        steps.append(self.replace_volume_closed(chambers,'TBS',self.rinse_volume,speed=self.closed_speed,pause=self.rinse_time))
+        steps.append(self.replace_volume_closed(chambers,'IBuffer',self.rinse_volume,speed=self.closed_speed,pause=self.rinse_time))
+        steps.append(self.format(port='Waste',volume=0.45,speed=1,pause=0,direction='Forward'))
+        # steps.append(self.mineral(volume=1))
+        return pd.concat(steps,ignore_index=True)
+
     def closed_strip_hybe_image(self,chambers,hybe):
         if not 'Hybe' in hybe:
             hybe = 'Hybe'+hybe
@@ -394,13 +431,14 @@ class Protocol:
         steps.append(self.replace_volume_closed(chambers,'TBS',self.rinse_volume,speed=self.closed_speed,pause=self.rinse_time))
         steps.append(self.replace_volume_closed(chambers,'WBuffer',self.rinse_volume,speed=self.closed_speed,pause=self.rinse_time))
         steps.append(self.prime({hybe:''},'Waste+2'))
-        steps.append(self.replace_volume_closed(chambers,hybe,self.hybe_volume,speed=self.closed_speed,pause=self.hybe_time,n_steps=3))
+        steps.append(self.replace_volume_closed(chambers,hybe,self.hybe_volume,speed=self.closed_speed,pause=self.hybe_time*2,n_steps=3))
         steps.append(self.replace_volume_closed(chambers,'WBuffer',self.rinse_volume,speed=self.closed_speed,pause=self.rinse_time))
         steps.append(self.replace_volume_closed(chambers,'WBuffer',self.rinse_volume,speed=self.closed_speed,pause=self.rinse_time))
         steps.append(self.replace_volume_closed(chambers,'TBS',self.rinse_volume,speed=self.closed_speed,pause=self.rinse_time))
         steps.append(self.replace_volume_closed(chambers,'TBS',self.rinse_volume,speed=self.closed_speed,pause=self.rinse_time))
         steps.append(self.replace_volume_closed(chambers,'IBuffer',self.rinse_volume,speed=self.closed_speed,pause=self.rinse_time))
         steps.append(self.format(port='Waste',volume=0.45,speed=1,pause=0,direction='Forward'))
+        # steps.append(self.mineral(volume=1))
         return pd.concat(steps,ignore_index=True)
     
     def closed_hybe_image(self,chambers,hybe):
@@ -411,19 +449,40 @@ class Protocol:
             steps.append(self.prime({'TCEP':'','TBS':'','WBuffer':'','IBuffer':''},'Waste+2'))
             if not self.simulate:
                 self.primed = True
-        # steps.append(self.replace_volume_closed(chambers,'TBS',self.rinse_volume,speed=self.closed_speed,pause=self.rinse_time))
-        # steps.append(self.replace_volume_closed(chambers,'TCEP',self.hybe_volume,speed=self.closed_speed,pause=self.hybe_time,n_steps=3))
-        # steps.append(self.replace_volume_closed(chambers,'TBS',self.rinse_volume,speed=self.closed_speed,pause=self.rinse_time))
         steps.append(self.replace_volume_closed(chambers,'TBS',self.rinse_volume,speed=self.closed_speed,pause=self.rinse_time))
         steps.append(self.replace_volume_closed(chambers,'WBuffer',self.rinse_volume,speed=self.closed_speed,pause=self.rinse_time))
         steps.append(self.prime({hybe:''},'Waste+2'))
-        steps.append(self.replace_volume_closed(chambers,hybe,self.hybe_volume,speed=self.closed_speed,pause=self.hybe_time,n_steps=3))
+        steps.append(self.replace_volume_closed(chambers,hybe,self.hybe_volume,speed=self.closed_speed,pause=self.hybe_time*2,n_steps=3))
         steps.append(self.replace_volume_closed(chambers,'WBuffer',self.rinse_volume,speed=self.closed_speed,pause=self.rinse_time))
         steps.append(self.replace_volume_closed(chambers,'WBuffer',self.rinse_volume,speed=self.closed_speed,pause=self.rinse_time))
         steps.append(self.replace_volume_closed(chambers,'TBS',self.rinse_volume,speed=self.closed_speed,pause=self.rinse_time))
         steps.append(self.replace_volume_closed(chambers,'TBS',self.rinse_volume,speed=self.closed_speed,pause=self.rinse_time))
         steps.append(self.replace_volume_closed(chambers,'IBuffer',self.rinse_volume,speed=self.closed_speed,pause=self.rinse_time))
+        steps.append(self.format(port='Waste',volume=0.45,speed=1,pause=60*4,direction='Forward'))
+        # steps.append(self.mineral(volume=1))
         return pd.concat(steps,ignore_index=True)
+    
+    # def closed_hybe_image(self,chambers,hybe):
+    #     if not 'Hybe' in hybe:
+    #         hybe = 'Hybe'+hybe
+    #     steps = []
+    #     if not self.primed:
+    #         steps.append(self.prime({'TCEP':'','TBS':'','WBuffer':'','IBuffer':''},'Waste+2'))
+    #         if not self.simulate:
+    #             self.primed = True
+    #     # steps.append(self.replace_volume_closed(chambers,'TBS',self.rinse_volume,speed=self.closed_speed,pause=self.rinse_time))
+    #     # steps.append(self.replace_volume_closed(chambers,'TCEP',self.hybe_volume,speed=self.closed_speed,pause=self.hybe_time,n_steps=3))
+    #     # steps.append(self.replace_volume_closed(chambers,'TBS',self.rinse_volume,speed=self.closed_speed,pause=self.rinse_time))
+    #     steps.append(self.replace_volume_closed(chambers,'TBS',self.rinse_volume,speed=self.closed_speed,pause=self.rinse_time))
+    #     steps.append(self.replace_volume_closed(chambers,'WBuffer',self.rinse_volume,speed=self.closed_speed,pause=self.rinse_time))
+    #     steps.append(self.prime({hybe:''},'Waste+2'))
+    #     steps.append(self.replace_volume_closed(chambers,hybe,self.hybe_volume,speed=self.closed_speed,pause=self.hybe_time,n_steps=3))
+    #     steps.append(self.replace_volume_closed(chambers,'WBuffer',self.rinse_volume,speed=self.closed_speed,pause=self.rinse_time))
+    #     steps.append(self.replace_volume_closed(chambers,'WBuffer',self.rinse_volume,speed=self.closed_speed,pause=self.rinse_time))
+    #     steps.append(self.replace_volume_closed(chambers,'TBS',self.rinse_volume,speed=self.closed_speed,pause=self.rinse_time))
+    #     steps.append(self.replace_volume_closed(chambers,'TBS',self.rinse_volume,speed=self.closed_speed,pause=self.rinse_time))
+    #     steps.append(self.replace_volume_closed(chambers,'IBuffer',self.rinse_volume,speed=self.closed_speed,pause=self.rinse_time))
+    #     return pd.concat(steps,ignore_index=True)
     
     def Storage2Gel(self,chambers,other):
         steps = []
@@ -492,6 +551,20 @@ class Protocol:
         steps.append(self.Gel2Hybe(chambers,other))
         # steps.append(self.replace_volume(chambers,'Hybe',0.5,speed=self.speed,pause=36*60*60))
         steps.append(self.Hybe2Image(chambers,other))
+        return pd.concat(steps,ignore_index=True)
+    
+    def MERFISHStripVolumeCheck(self,chambers,other):
+        primed = self.primed
+        self.primed = True
+        n_hybes = 19
+        if '+' in other:
+            other,n_hybes = other.split('+')
+            n_hybes = int(n_hybes)
+        steps = []
+        for i in range(n_hybes):
+            steps.append(self.closed_strip_image(chambers,str(i)))
+            steps.append(self.closed_hybe_image(chambers,str(i)))
+        self.primed = primed
         return pd.concat(steps,ignore_index=True)
     
     def MERFISHVolumeCheck(self,chambers,other):
