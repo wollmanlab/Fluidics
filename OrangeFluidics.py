@@ -26,8 +26,8 @@ class OrangeFluidics(Fluidics):
         self.Protocol.chamber_volume = 5
         self.Protocol.rinse_volume = 2
         self.Protocol.hybe_volume = 2
-        self.Protocol.rinse_time = 60
-        self.Protocol.hybe_time = 20*60
+        self.Protocol.rinse_time = 2.5*60
+        self.Protocol.hybe_time = 30*60
         self.Protocol.prime_volume = 3
         self.Protocol.vacume = True
         self.Valve_Commands = {'Dapi':{'valve':3,'port':2},
