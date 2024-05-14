@@ -19,7 +19,6 @@ class OrangeFluidics(Fluidics):
         self.Valve.device = self.device
         self.Pump.wait_factor = 1/2
         self.Pump.speed_conversion = 1.9*(5/4) #s/mL
-        self.Protocol.speed = 1
         self.Protocol.closed_speed = 0.25
         self.Protocol.wait_factor = self.Pump.wait_factor
         self.Protocol.speed_conversion = self.Pump.speed_conversion
@@ -30,6 +29,11 @@ class OrangeFluidics(Fluidics):
         self.Protocol.hybe_time = 30*60
         self.Protocol.prime_volume = 3
         self.Protocol.vacume = True
+
+        self.Protocol.speed = 0.5#1
+        self.Protocol.max_speed = 0.5#1
+        self.Protocol.mixes = 0#3
+
         self.Valve_Commands = {'Dapi':{'valve':3,'port':2},
                                 'TBS':{'valve':3,'port':6},
                                 'HybeTBS':{'valve':3,'port':6},
