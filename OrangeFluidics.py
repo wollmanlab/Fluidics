@@ -22,7 +22,7 @@ class OrangeFluidics(Fluidics):
         self.Protocol.closed_speed = 0.25
         self.Protocol.wait_factor = self.Pump.wait_factor
         self.Protocol.speed_conversion = self.Pump.speed_conversion
-        self.Protocol.chamber_volume = 5
+        self.Protocol.chamber_volume = 2.5
         self.Protocol.rinse_volume = 2
         self.Protocol.hybe_volume = 2
         self.Protocol.rinse_time = 2.5*60
