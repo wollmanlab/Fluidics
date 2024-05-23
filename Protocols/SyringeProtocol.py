@@ -71,9 +71,19 @@ class SyringeProtocol(Protocol):
         if self.vacume:
             # determine Vacume Port
             vacume_chamber = 'Vacume_'+chamber
-            # Set Vacume To Chamber
-            steps.append(self.format(port=vacume_chamber,volume=volume,speed=self.speed ,pause=0,direction='None'))
-            steps.append(self.wait(1))
+            if chamber=='Waste':
+                steps.append(self.format(port=vacume_chamber,volume=0,speed=self.speed ,pause=0,direction='None'))
+            else:
+                dual_vacume=True
+
+                if dual_vacume:
+                    steps.append(self.format(port=vacume_chamber,volume=0,speed=self.speed ,pause=0,direction='None'))
+                    steps.append(self.format(port=chamber,volume=self.chamber_volume,speed=self.max_speed ,pause=pause,direction='Reverse'))
+                    steps.append(self.format(port='Waste',volume=self.chamber_volume,speed=self.max_speed ,pause=pause,direction='Forward'))
+                else:
+                    # Set Vacume To Chamber
+                    steps.append(self.format(port=vacume_chamber,volume=volume,speed=self.speed ,pause=0,direction='None'))
+                    steps.append(self.wait(1))
         else:
             steps.append(self.format(port=chamber,volume=self.chamber_volume,speed=self.max_speed ,pause=pause,direction='Reverse'))
             steps.append(self.format(port='Waste',volume=self.chamber_volume,speed=self.max_speed ,pause=pause,direction='Forward'))
