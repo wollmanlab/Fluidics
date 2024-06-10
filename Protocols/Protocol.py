@@ -188,10 +188,13 @@ class Protocol:
         steps = []
         if not '+' in tube:
             tube = tube+'+5'
+        old_max_speed = self.max_speed
+        self.max_speed = 1
         steps.append(self.reverse_flush(Valve_Commands,tube))
         steps.append(self.prime(Valve_Commands,tube))
         steps.append(self.reverse_flush(Valve_Commands,'Air+3'))
         steps.append(self.reverse_flush(Valve_Commands,'Air+3'))
+        self.max_speed = old_max_speed
         return pd.concat(steps,ignore_index=True)
 
     def prime(self,Valve_Commands,tube):
