@@ -1,13 +1,15 @@
 void SerialParser(void) {
+  // Read formatted input message (@{direction}%{speed}_{duration}$!) from serial port.
   char readChar[64];
-  Serial.readBytesUntil(33,readChar,64);
+  Serial.readBytesUntil(33,readChar,64); // 33 is the ASCII code for ! which marks the end of the message.
   String read_ = String(readChar);
-  // Format is @{direction}%{speed}_{duration}$!
+  // Get the index location of the delimiters (%,_,$) marking the end of direction,speed,duration. 
   int idx1 = read_.indexOf('%');
   int idx2 = read_.indexOf('_');
   int idx3 = read_.indexOf('$');
+  // Set the smallest allowable pump duration, in the unit of seconds.
   float dt = 0.1;
-  // separate command from associated data
+  // Extract direction, speed and duration from the message.
   String pump_direction = read_.substring(1,idx1);
   float speed_fraction = atof(read_.substring(idx1+1,idx2).c_str());
   float pump_duration = atof(read_.substring(idx2+1,idx3).c_str());
@@ -16,7 +18,7 @@ void SerialParser(void) {
 
   // Direction (F,R) // Speed_Fraction(0.1-1) // Duration (float)
   
-  // determine command sent
+  // Determine which pin to activate based on the direction
   int pin = 13;
   bool skip = true;
   if (pump_direction == "F") {
@@ -29,7 +31,7 @@ void SerialParser(void) {
   }
   else if (pump_direction == "U") {
       pin = 13; 
-      skip = true; 
+      skip = true; // When direction is undefined, set skip to true to skip any pumping
   }
 
   
