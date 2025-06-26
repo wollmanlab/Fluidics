@@ -3,7 +3,7 @@ Pump has three key properties: `direction`, `volume` and `speed` .
 - `direction`: The direction for pumping the fluid.
 When set to `Forward`, the pump attempts to inject fluid into the chamber.
 When set to `Reverse`, the pump attempts to withdraw fluid from the chamber.
-When set to `Undefined`, the pump is idle. We set `direction` to `Undefined` to stop the pump after the it finishes one injecting/withdrawing.
+When set to `Undefined`, the pump is idle. We set `direction` to `Undefined` to stop the pump after it finishes one injecting/withdrawing.
 - `volume`: The amount of liquid to be pumped, in the unit of mL.
 - `speed`: The speed at which the liquid is pumped, in the unit of mL/s.
 ## SyringePump Class
