@@ -12,4 +12,4 @@ Commands can be sent from the computer by writing serial message with a specific
 The format of the message is `@{direction}%{speed}_{duration}$!` where direction is abbreviated by `Forward`->`F`,`Reverse`->`R`,`Undefined`->`U`. 
 For example, `@{R}%{1}_{5}` means pumping in the reverse direction at 1mL/s for 5 seconds . 
 
-See [Arduino_Syringe_V2.ino](Pumps/Arduino_Syringe_V2/Arduino_Syringe_V2.ino) for details on how Arduino interpret the messages and cotrol the syringe pump.
+See [Arduino_Syringe_V2.ino](Arduino_Syringe_V2/Arduino_Syringe_V2.ino) for details on how Arduino interpret the messages and cotrol the syringe pump.
