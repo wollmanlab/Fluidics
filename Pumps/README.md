@@ -19,7 +19,7 @@ For example, `@{R}%{0.75}_{5}` means pumping in the reverse direction at a 0.75 
 The reason for this weird change is because we have no access to setting the speed of the syringe pump.
 We can only specify its direction and how long it stays on/off. 
 Therefore, we have to use duty cycle as an indirect way of adjusting speed by cycling the pump between on and off.
-Theoretically, `speed` can be any number between 0 to 1, but practically, due to the way of how duty cycle is implemented, there are only 11 levels that makes real difference: 0, 0.1, 0.2, 0.3,...,0.9,1. Any number in between will just be rounded to the closest level. For example, 0.25 will be rounded to 0.3; 0.01 will be rounded to 0 and the pump will not pump at all.
+Theoretically, `speed` can be any number between 0 to 1, but practically, due to the way of how duty cycle is implemented in [Arduino_Syringe_V2.ino](Arduino_Syringe_V2/Arduino_Syringe_V2.ino), there are only 11 levels that makes real difference: 0, 0.1, 0.2, 0.3,...,0.9,1. Any number in between will just be rounded to the closest level. For example, 0.25 will be rounded to 0.3; 0.01 will be rounded to 0 and the pump will not pump at all.
 ## Further reading
 - See [SyringePump_v2.py](SyringePump_v2.py) for details on how user specified properties (`direction`,`volume`,`speed`) is converted to the formatted serial message.
 - See [Arduino_Syringe_V2.ino](Arduino_Syringe_V2/Arduino_Syringe_V2.ino) for details on how Arduino interpret the messages and cotrol the syringe pump.
