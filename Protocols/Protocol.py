@@ -3,28 +3,30 @@ import numpy as np
 from fileu import *
 class Protocol:
     def __init__(self,gui=False):
-        self.verbose=True
-        self.protocols = {}
+        self.verbose=True # When in verbose mode, update_user() will record the input message to the log.
+        self.protocols = {} # A dictionary for holding all the protocols (functions).
 
         self.simulate = False
         self.vacume = False
 
-        self.chamber_volume = 3
-        self.flush_volume = 1.5
-        self.prime_volume = 2
-        self.rinse_volume = 3
-        self.hybe_volume = 3
-        self.mixes = 3
+        self.chamber_volume = 3 # Volume of one chamber, in the unit of mL
+        self.flush_volume = 1.5 # Unknown meaning, not used anywhere
+        self.prime_volume = 2 # Volume of the fluid for priming to fill all the dead volume, in the unit of mL.
+        self.rinse_volume = 3 # Volume of the fluid for rinsing one chamber, in the unit of mL
+        self.hybe_volume = 3 # Volume of the hybridization mixture for one chamber, in the unit of mL
+        
+        self.mixes = 3 # Number of mixes to do during hybridization.
 
-        self.rinse_time = 60
-        self.hybe_time = 600
-        self.max_speed = 1
-        self.speed = 1
-        self.closed_speed = 0.3
+        self.rinse_time = 60 # The duration for one rinse of the chamber, in the unit of sec.
+        self.hybe_time = 600 # The duration for one hybridization, in the unit of sec.
+        self.max_speed = 1 # The maximum speed allowed for the fluidic flow, 1 means 100% here.
+        self.speed = 1 # The speed of the protocol
+        self.closed_speed = 0.3 # The speed when a closed (sealed) chamber is used rather than an open chamber.
         self.wait_factor = 0
         self.speed_conversion = 1.5
-        self.primed = False
+        self.primed = False # Indicating whether the fluidic system has been primed or not to fill all dead volume
 
+        # Add protocols to the dictionary.
         self.protocols['Valve'] = self.valve
         self.protocols['Clean'] = self.clean
         self.protocols['Hybe'] = self.hybe
@@ -52,11 +54,16 @@ class Protocol:
         self.protocols['dendcyclegradient'] = self.dendcyclegradient
         self.protocols['dendgradient'] = self.dendgradient
 
+    # self.update_user() is for writing messages to the log
     def update_user(self,message,level=20,logger='Protocol'):
         logger = self.device +'***' + logger
         if self.verbose:
             update_user(message,level=level,logger=logger)
             
+    # self.get_steps() executes the a protocol at user specified chambers with user specified arguments
+    # protocol: the name of the protocol
+    # chambers: an array specifying the chambers where the protol should be run
+    # other: other arguments the protocol need besides chamber.
     def get_steps(self,protocol,chambers,other):
         steps = self.protocols[protocol](chambers,other)
         self.update_user('Executing Protocol:')
