@@ -7,14 +7,16 @@ When set to `Undefined`, the pump is idle. We set `direction` to `Undefined` to 
 - `volume`: The amount of liquid to be pumped, in the unit of mL.
 - `speed`: The speed at which the liquid is pumped, in the unit of mL/s.
 ## SyringePump Class
-In the real setup, one syringe pump is used for the pumping of fluid. The syring pump is under the direct control of Arduino. 
-Commands can be sent from the computer by writing serial message with a specific format. 
+In the real setup, one syringe pump is used for the pumping of fluid.
+The syring pump is under the direct control of Arduino which constantly scans for commands (formated serial messages) from the computer. 
 The format of the message is `@{direction}%{speed}_{duration}$!`: 
 - `direction` is abbreviated by `Forward`->`F`,`Reverse`->`R`,`Undefined`->`U` to minimze RAM consumption on Arduino.
 - **Very Important**: The meaning of `speed` is changed in the context of SyringePump Class.
 It means duty cycle, the percentage of time where the pump is set to be on. See next section for detailed discussion.
 - `duration` (in the unit of sec) is calculated based on `volume` and `speed` (duty cycle) and the calibrated speed of the syringe pump.
-For example, `@{R}%{0.75}_{5}` means pumping in the reverse direction at a 0.75 duty cycle for 5 seconds . 
+
+For example, `@{R}%{0.75}_{5}` means pumping in the reverse direction at a 0.75 duty cycle for 5 seconds.
+Once arduino receives a serial message, it translates it into high/low voltages to write to each pin to execute the corresponding actions.
 ### `speed` of SyringePump Class
 The reason for this weird change is because we have no access to setting the speed of the syringe pump.
 We can only specify its direction and how long it stays on/off. 
