@@ -40,10 +40,23 @@ However, a `chamber` can still be referred by `port` in this case because we can
 Therefore, in protocols' dataframe, we can just refer to a `chamber` by referring to `port`(s). 
 
 However, during documentation and coding, for added clarity, we still use `chamber` to refer to the chamber holding the samples and `port`, in most cases, refer to a solution container.
-# SyringeProtocol Class: building blocks for complex protocols
+# SyringeProtocol Subclass: building blocks for complex protocols
 Since each protocol is essentially a function returning a dataframe, an easy way to build very complex protocol based on existing protocols is to append the dataframes returned by the existing protocols. 
 Therefore, multiple building-block protocols dealing with frequently encountered actions are provided in the SyringeProtocol Class, a subcalss of the Protocol Class:
 - `add_liquid`: Draws liquid from a `port` and injects it into a `chamber` based on user specified settings.
-- `empty_chamber`: Empty a `chamber` with vacuum or pump (rare case).
+- `empty_chamber`: Empty a `chamber` with vacuum (if available) or pump.
 - `add_volume_single`: First `empty_chamber` and then `add_liquid`.
-- `replace_volume_single`: 
+- `simultaneous_replace_volume_single`: Empty a `chamber` with vacuum and simultaneously load solution to be injected into the syringe pump.
+The vacuum is then turned off and solution injected into the `chamber`.
+When compared with `add_volume_single`, this protocol shortens the time where the chamber is not filled with solution and thus speeds up fluidic exchange process and reduces risk of sample drying out.
+- `replace_volume_single`: If vacuum is available, it just returns `simultaneous_replace_volume_single`.
+When vacuum is not available, it `empty_chamber`-> wait for 1 sec -> `add_liquid` -> wait for 1 sec.
+- `replace_volume_closed_single`: Replace solution in a closed chamber by pumping in new solution.
+When compared with `add_liquid`, this protocol allows user to pump in solution in seprated steps with a resting period in between.
+This slows down the flow of the solution into the closed chamber and reduces the risk of leakage due to build-up of pressure in a closed chamber.
+
+**Note**: Since virtually all protocols in the Protocol Class rely on the building blocks defined in the SyringeProtocol Class, you should almost always use the SyringeProtocol Subclass rather than the Protocol Superclass in the Fluidics Class. 
+
+# Further readings
+- See [SyringeProtocol.py](SyringeProtocol.py) for details on how to use building block protocols.
+- See [Protocol.py](Protocol.py) for details of all available protocols.
