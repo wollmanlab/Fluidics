@@ -21,21 +21,23 @@ However, the vaccum on these wide-field microscopes is currently not used due to
 |Valve Controller|To be added|
 ## Software
 ### Superclasses
-This library consists of four superclasses: [Pump](Pumps), [Valve](Valves/Valve.py), [Protocol](Protocols/Protocol.py), [Fluidics](Fluidics.py).
+The key to understanding how this library works is its four superclasses: `Pump`, `Valve`, `Protocol`, `Fluidics`.
 
-The definition of `Pumps`, `Valves`, `Protocols` can be found in the folder with the corresponding name. The definition of `Fluidics` is in the root. 
-
-`Pumps`: This superclass contains general properties and methods for the control of all types of pumps in the fluidic system. 
+`Pump`: This superclass contains general properties and methods for the control of all types of pumps in the fluidic system. 
 The control of any specific subtype of pump (e.g. syringe pump, diaphragm pump) can be further customized by inheriting this superclass. 
 
-`Valves`: This superclass contains general properties and methods for the control of all types of valves in the fludic system.
+`Valve`: This superclass contains general properties and methods for the control of all types of valves in the fludic system.
 The control of any specific subtype of valve (e.g. rotatory valve, solenoid valve) can be further customized by inheriting this superclass. 
 
-`Protocols`: This superclass contains general properties and methods for designing a protocol. 
+`Protocol`: This superclass contains general properties and methods for designing a protocol. 
 A protocol in the context of this resiporatory means a series of coordinated operation of one or more components (e.g. pump and/or valve).
  
-`Fluidics`: This superclass contains general properties and methods for interpreting `Protocols` and executing `Protocols` by utilizing `Pumps` and `Valves`.
+`Fluidics`: This superclass contains general properties and methods for interpreting `Protocol` and executing `Protocol` by utilizing `Pump` and `Valve`.
 To set up a specific fluidic system (e.g. fluidic system for the microscope 'orange'), one can create a subcalss by inheriting this superclass (e.g. OrangeFluidics).
 
-### Comments on Version
+Details of `Fluidics` will be discussed in the next section. 
+Before reading the next section, it is recommended to first go to [Pump](Pumps), [Valve](Valves), [Protocol](Protocols) to learn more about these three classes.
+### The Fluidics Class
+
+### Comments on file version
 For a file with suffix _v2, _v3, ..., _vN, the latest version is always the actively used one unless otherwise specified.   
