@@ -30,7 +30,7 @@ We can also have a more complex protocol involving multiple sequential actions. 
 ## `port` and `chamber`
 In practice, to maximize the throughput of the fluidic system, we frequently swicth between multiple samples during one single experiment. 
 For example, when one sample is being imaged on the microscope, another sample can be washed and incubated such that it can be ready once the microscope finishes imaging the current sample. 
-This leads to the concept of `chamber` where samples are split into different chambers such that when one chamber is being imaged, the other chamber(s) can be processed by the fluidic system.
+This leads to the concept of `chamber` where samples are split into different chambers such that in the example above, when one chamber is being imaged, the other chamber(s) can be processed by the fluidic system.
 
 You can frequently see `chamber` appears in the [source code of the Protocol Class](Protocol.py), but we do not have a separate column dedicated to `chamber` in the dataframe.
 This is because, similar to solution containers, `chamber` is also connected to a specific port on a specific valve.
@@ -39,7 +39,7 @@ This is in fact the most common setup we use becasue we connect outlets to vacuu
 However, a `chamber` can still be referred by `port` in this case because we can just refer to one chamber by the inlet `port` for injecting solution into it and by the outlet `port` when we want to remove solution from it. 
 Therefore, in protocols' dataframe, we can just refer to a `chamber` by referring to `port`(s). 
 
-However, during documentation and coding, for added clarity, we still use `chamber` to refer to the chmaber holding the samples and `port`, in most cases, refer to a solution container.
+However, during documentation and coding, for added clarity, we still use `chamber` to refer to the chamber holding the samples and `port`, in most cases, refer to a solution container.
 # SyringeProtocol Class: building blocks for complex protocols
 Since each protocol is essentially a function returning a dataframe, an easy way to build very complex protocol based on existing protocols is to append the dataframes returned by the existing protocols. 
 Therefore, multiple building-block protocols dealing with frequently encountered actions are provided in the SyringeProtocol Class, a subcalss of the Protocol Class:
