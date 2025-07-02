@@ -21,7 +21,7 @@ However, the vaccum on these wide-field microscopes is currently not used due to
 |Valve Controller|To be added|
 ## Software
 ### Superclasses
-This library consists of four superclasses: `Pumps`, `Valves`, `Protocols`, `Fluidics`.
+This library consists of four superclasses: [Pump](Pumps), [Valve](Valves/Valve.py), [Protocol](Protocols/Protocol.py), [Fluidics](Fluidics.py).
 
 The definition of `Pumps`, `Valves`, `Protocols` can be found in the folder with the corresponding name. The definition of `Fluidics` is in the root. 
 
