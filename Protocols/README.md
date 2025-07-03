@@ -10,10 +10,12 @@ For example, we can assign the name `DAPI` to port 2 on valve 3 which is connect
 After assigning this name in the Fluidic Class, we can put `DAPI` in the `port column` for any action that involves port 2 on valve 3.
 - `volume`: Amount of fluid to be moved in the unit of mL.
 - `speed`: Relative speed of pumping the fluid. A value between 0 and 1 to indicate percentage of max speed. 1 means 100% of max speed.
-- `pause`: Extra amount of buffer time to pause the system without doing anything to ensure the action is finished before moving onto the next one. 
+- `pause`: Extra amount of buffer time (in the unit of sec) to pause the system without doing anything to ensure the action is finished before moving onto the next one. **Note**: In some protocols, `pause` is also used to indicate the duration of incubation.
 - `direction`: The direction to move the fluid, can be `Forward` or `Reverse` or `Wait`. 
 - `time_estimate`: This value is usually automatically calculated in the unit of sec using the formula: `time_estimate` = (`volume`/`speed`*`speed_conversion`)+1+`pause` 
 where `speed_conversion` in the unit of sec/mL is just 1/maximum_flow_rate.
+
+There is a handy function `format(self,port='A',volume=0,speed=1,pause=0,direction='Forward')` in the Protocol Class which calculates `time_estimate` and return a single row dataframe based on the inputs. A simple protocol can be made by appending the outputs from `format()`.
 ## Examples
 For example, we have a simple protocol `wait` which just asks the system to wiat for certain amount of time. 
 This is achived by defining a `wait` method in the Protocol Class which takes the amount of time to wait (e.g., 12 sec) as input and retunrs the following dataframe where the amount of time to wait is specified in the `pause` column:
