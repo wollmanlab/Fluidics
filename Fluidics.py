@@ -13,18 +13,20 @@ import sys
 import os
 from math import floor,ceil
 
+# Adding all subdirectories in the directory of Fluidics.py to the path of python.
 dir = os.path.dirname(os.path.abspath(__file__))
 for file in os.listdir(dir):
     if os.path.isdir(os.path.join(dir,file)):
         sys.path.append(os.path.join(dir,file))
 
+# An argument parser to allow user to specify which subclass of fluidics to use.
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("-f", "--fluidics_class", type=str, dest="fluidics_class", default="Fluidics", action='store', help="Which Fluidics Class to use")
     args = parser.parse_args()
-
-
-
+"""
+    Definition of the superclass Fluidics
+"""
 class Fluidics(object):
     def __init__(self,gui=False):
         self.verbose=True
@@ -34,22 +36,25 @@ class Fluidics(object):
         # self.Valve = Valve(gui=gui)
 
         self.device = self.__class__.__name__
+        # file_path points to the XXXX_Staus.txt file for the communication bewteen Fluidics and other software
         self.file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),self.device+'_Status.txt')
-        self.last_message = ""
-        self.Valve_Commands = {}
-        self.busy=False
+        self.last_message = "" # The latest message from other software
+        self.Valve_Commands = {} 
+        self.busy=False # Whether the fluidics is busy with running a protocol
 
         # self.thread = threading.Thread(target=self.run)
         # self.thread.daemon = True # without the daemon parameter, the function in parallel will continue even your main program ends
         # self.thread.start()
         if not gui:
             self.update_communication('Available')
-
+    
+    # update_user() is for writing messages to the log
     def update_user(self,message,level=20,logger='Fluidics'):
         logger = self.device +'***' + logger
         if self.verbose:
             update_user(message,level=level,logger=logger)
-
+    
+    # run() is for interpreting and running the command from other software.
     def run(self):
         if not self.busy:
             # Read Communication
@@ -69,6 +74,7 @@ class Fluidics(object):
                 self.busy = False
         precise_sleep(5)
 
+    # read_communication() is for reading a message from the XXXX_Staus.txt file.
     def read_communication(self):
         with open(self.file_path,'r') as f:
             message = f.read()
@@ -77,11 +83,13 @@ class Fluidics(object):
             self.update_user(message)
         return message
 
+    # update_communication() is for writing to the XXXX_Staus.txt file to give other software an update, e.g. a protocol has been finished
     def update_communication(self,message):
         self.update_user(message)
         with open(self.file_path,'w') as f:
                 f.write(message)
 
+    # interpret_message() is for interpreting(spliting) the formated message read from XXXX_Staus.txt file into protocol, chambers, other
     def interpret_message(self,message):
         protocol,chambers,other = message.split('*')
         if '!' in other:
@@ -100,6 +108,10 @@ class Fluidics(object):
             chambers = self.Valve_Commands
         return protocol,chambers,other
 
+    # execute_protocol() is for executing a protocol based on the protocol, chambers, other.
+    # protocol: name of the protocol to execute.
+    # chambers: the chambers where the protocol should be executed.
+    # other: other necessary arguments to specify the protocol
     def execute_protocol(self,protocol,chambers,other):
         steps = self.Protocol.get_steps(protocol,chambers,other)
         if not isinstance(steps,pd.DataFrame):
@@ -177,6 +189,7 @@ class Fluidics(object):
             total_time = total_time-(minutes*60)
             self.update_user('Estimated Total Time: '+str(int(hours))+'h'+str(int(minutes))+'m'+str(int(total_time))+'s')
 
+# Load the subclass selected by user.
 if __name__ == '__main__':
     fluidics_class = args.fluidics_class
     module = importlib.import_module(fluidics_class)
