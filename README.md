@@ -75,6 +75,8 @@ When the fluidic system finishes certain command, it can let other systems know 
 `Finished:Name_of_protocol_to_run*[Chambers to run the protocol]*Other_supplementary_input`
 
 For example, `Finished:Hybe*[A,B]*25` means the `Hybe` protocol in the previous example is finished.
+### Further reading for the Fluidics Class
+- See [Fluidics.py](Fluidics.py) for details on the attributes and methods for carrying out the two above tasks.
 
-### Comments on file version
+## Comments on file version
 For a file with suffix _v2, _v3, ..., _vN, the latest version is always the actively used one unless otherwise specified.   
