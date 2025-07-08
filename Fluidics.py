@@ -39,7 +39,7 @@ class Fluidics(object):
         # file_path points to the XXXX_Staus.txt file for the communication bewteen Fluidics and other software
         self.file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),self.device+'_Status.txt')
         self.last_message = "" # The latest message from other software
-        self.Valve_Commands = {} 
+        self.Valve_Commands = {} # A dictionary for mapping port ID to specific port, see any subclass of Fluidics for examples.
         self.busy=False # Whether the fluidics is busy with running a protocol
 
         # self.thread = threading.Thread(target=self.run)
@@ -138,27 +138,35 @@ class Fluidics(object):
         self.simulate = False
         self.Protocol.simulate = False
 
+    # flow() is for executing the most basic step of a protocol (one row of the Protocol dataframe) based on the column values.
     def flow(self,port,volume,speed,pause,direction):
         self.set_port(port)
         self.start_flow(volume,direction,speed)
         self.sleep(pause)
 
+    # set_port() is for selecting the port of a specific valve based on the port ID.
+    # command: the port ID of the port to set (e.g. TBS, Hybe10, Hybe25,...)
     def set_port(self,command):
         if not command in self.Valve_Commands.keys():
             self.update_user('          Unknown Tube: '+command)
         else:
             # self.update_user('          Tube: '+command)
-            """ Set Port """
+            # Look up and select the valve and port number corresponding to the input port ID
             self.Valve.set_port(int(self.Valve_Commands[command]['valve'])-1, int(self.Valve_Commands[command]['port'])-1)
+            # This while loop to be a trick for selecting a series of valves based on special port ID naming "ValveN".
+            # See NinjaFluidics.py, RonageFLuidics.py, and PurpleFluidics.py for an example where the command Valve2 can select both Valve2 and Valve3
             command = 'Valve'+str(self.Valve_Commands[command]['valve'])
             while command in self.Valve_Commands.keys():
                 self.Valve.set_port(int(self.Valve_Commands[command]['valve'])-1, int(self.Valve_Commands[command]['port'])-1)
                 command = 'Valve'+str(self.Valve_Commands[command]['valve'])
 
+    # start_flow() is Pump class's start_flow with a sanity check of volume>0
     def start_flow(self,volume,direction,speed):
         if volume>0:
             self.Pump.start_flow(volume,direction,speed)
 
+    # sleep() is for waiting for t amount of time and updating user every 10sec.
+    # t: amount of time to wait in the unit of sec.
     def sleep(self,t):
         if t>0:
             self.update_user('          Wait '+str(round(t))+'s')
@@ -167,6 +175,8 @@ class Fluidics(object):
                 if t>0:
                     self.update_user('          '+str(round((i+1)*10))+'% Complete')
 
+    # summarize_protocol() is for generating a summary of the steps by calculating total volume for each port and total estimated time.
+    # steps: a dataframe to summarize where each row is one step
     def summarize_protocol(self,steps):
         self.update_user('Protocol Summary')
         ports = np.unique(steps['port'])
