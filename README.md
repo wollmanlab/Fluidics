@@ -20,24 +20,61 @@ However, the vaccum on these wide-field microscopes is currently not used due to
 |Valve|To be added|
 |Valve Controller|To be added|
 ## Software
+### Conda environment Setup
+```bash 
+conda create --name fluidics_control python=3.7 
+pip install pyserial 
+pip install pandas
+```
 ### Superclasses
 The key to understanding how this library works is its four superclasses: `Pump`, `Valve`, `Protocol`, `Fluidics`.
 
-`Pump`: This superclass contains general properties and methods for the control of all types of pumps in the fluidic system. 
+`Pump`: This superclass contains general attributes and methods for the control of all types of pumps in the fluidic system. 
 The control of any specific subtype of pump (e.g. syringe pump, diaphragm pump) can be further customized by inheriting this superclass. 
 
-`Valve`: This superclass contains general properties and methods for the control of all types of valves in the fludic system.
+`Valve`: This superclass contains general attributes and methods for the control of all types of valves in the fludic system.
 The control of any specific subtype of valve (e.g. rotatory valve, solenoid valve) can be further customized by inheriting this superclass. 
 
-`Protocol`: This superclass contains general properties and methods for designing a protocol. 
+`Protocol`: This superclass contains general attributes and methods for designing a protocol. 
 A protocol in the context of this resiporatory means a series of coordinated operation of one or more components (e.g. pump and/or valve).
  
-`Fluidics`: This superclass contains general properties and methods for interpreting `Protocol` and executing `Protocol` by utilizing `Pump` and `Valve`.
+`Fluidics`: This superclass contains general attributes and methods for interpreting `Protocol` and executing `Protocol` by utilizing `Pump` and `Valve`.
 To set up a specific fluidic system (e.g. fluidic system for the microscope 'orange'), one can create a subcalss by inheriting this superclass (e.g. OrangeFluidics).
 
 Details of `Fluidics` will be discussed in the next section. 
 Before reading the next section, it is recommended to first go to [Pump](Pumps), [Valve](Valves), [Protocol](Protocols) to learn more about these three classes.
 ### The Fluidics Class
+The Fluidics Class offers attributes and methods for two major tasks: 1) interpret and execute `Protocol`, and 2) communicate with other software (e.g a matlab app for controlling the microscope).
+#### Task 1: interpret and execute `Protocol`
+For interpreting and executing `Protocol`, one should first create a subclass inheriting the FLuidics Class specifically for the fluidics system to be controlled.
+The naming convention is `XXXFluidics` where XXX is the nickname for the fluidics system.
+Since this subclass will always have an instance of `Pump`,`Valve` and `Protocol`, one can also specify systeme-specific attributes of these three classes in this subclass.
+
+A key attribute of the subclass itself is `Valve_Commands`.
+`Valve_Commands` is a dictionary for mapping the port ID (key) to a specific port on a specific valve (value). 
+Port ID is just a nickname for each port.
+For clarity, it is a good practice to create Port ID based on what the port is connected to. 
+For example, one can name the port connected to the container of Tris-Buffered Saline as TBS.
+As a convention:
+- Capitalized letters (A,B,C,D,E...) are used to refer to chambers holding different samples.
+- HybeX (X is a positive integer) are used to refer to readout probes.
+
+One can refer to [fluidics for the microscope Purple](PurpleFluidics.py), [fluidics for the microscope Orange](OrangeFluidics.py),... for examples on how to set up a subclass for a specific fluidic system.
+#### Task 2: Communicate with other software: the XXX_Status.txt
+In many cases, the fluidic control system need to cooperate with other types of control systems. One frequent case is cooperate with imaging software controlling the microscope. 
+Cooperation requires communication between the involved control systems.
+The heuristic solution we use is to have different control systems write and read txt files.
+More specifically, the Fluidics class has built-in methods for read and write to XXX_Status.txt (XXX is the name of the class, e.g. OrangeFluidics, PurpleFluidics).
+When other control system wants the fluidics system to run a specific protocol, it can write to XXX_Status.txt a formatted message:
+
+`Command:Name_of_protocol_to_run*[Chambers to run the protocol]*Other_supplementary_input`
+
+For example `Command:Hybe*[A,B]*25` commands the fluidic system to run the protocol `Hybe` in chamber A and B using readout probe `25`.
+When the fluidic system finishes certain command, it can let other systems know by writing to XXX_Status.txt:
+
+`Finished:Name_of_protocol_to_run*[Chambers to run the protocol]*Other_supplementary_input`
+
+For example, `Finished:Hybe*[A,B]*25` means the `Hybe` protocol in the previous example is finished.
 
 ### Comments on file version
 For a file with suffix _v2, _v3, ..., _vN, the latest version is always the actively used one unless otherwise specified.   
