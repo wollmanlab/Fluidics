@@ -44,7 +44,7 @@ Details of `Fluidics` will be discussed in the next section.
 Before reading the next section, it is recommended to first go to [Pump](Pumps), [Valve](Valves), [Protocol](Protocols) to learn more about these three classes.
 ### The Fluidics Class
 The Fluidics Class offers attributes and methods for two major tasks: 1) interpret and execute `Protocol`, and 2) communicate with other software (e.g a matlab app for controlling the microscope).
-#### Task 1: interpret and execute `Protocol`
+#### Task 1: Interpret and execute `Protocol`
 For interpreting and executing `Protocol`, one should first create a subclass inheriting the FLuidics Class specifically for the fluidics system to be controlled.
 The naming convention is `XXXFluidics` where XXX is the nickname for the fluidics system.
 Since this subclass will always have an instance of `Pump`,`Valve` and `Protocol`, one can also specify systeme-specific attributes of these three classes in this subclass.
