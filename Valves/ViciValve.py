@@ -22,7 +22,7 @@ class ViciValve(Valve):
         self.read_length = 64
         self.char_offset = 97
 
-    # self.set_port() selects the specified port of the specified Vici valve.
+    # set_port() selects the specified port of the specified Vici valve.
     def set_port(self, valve_ID, port_ID):
         # Send a formated serial message readable by Vici Valve to select port with port_ID on the valve with valve_ID
         valve_ID = str(valve_ID)
@@ -33,7 +33,7 @@ class ViciValve(Valve):
         # Update the current_port dictionary
         self.current_port[valve_ID] = self.get_port(valve_ID)
 
-    # self.get_port() is for getting the currently selected port of the specified Vici valve. 
+    # get_port() is for getting the currently selected port of the specified Vici valve. 
     def get_port(self,valve_ID):
         message = "CP\r" # This is the serial message for Vici valve to return the current port.
         response = self.inquireAndRespond(valve_ID, message)
@@ -42,14 +42,14 @@ class ViciValve(Valve):
         if response[1]:
             return response[3].split(' ')[-1]
             
-    # self.get_port() reads the serial message from Vici valve and get the content before the ending marker (carriage_return).  
+    #  read() reads the serial message from Vici valve and get the content before the ending marker (carriage_return).  
     def read(self):
         response = self.serial.read(self.read_length).split(self.carriage_return)[0]
         # if self.verbose:
             # self.update_user "Received: " + str((response, ""))
         return response
         
-    # self.write() encodes the message with utf-8 and send it to the Vici valve
+    # write() encodes the message with utf-8 and send it to the Vici valve
     def write(self, message):
         message = bytes(message, 'utf-8')
         self.serial.write(message)
