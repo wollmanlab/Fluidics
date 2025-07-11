@@ -13,12 +13,11 @@ Due to the much larger volume of chamber (~30mL), vacuum is to be used for remov
 You may notice some wide-field microscopes for ATLAS 2D have this setup.
 However, the vaccum on these wide-field microscopes is currently not used due to increased sample displacement issues when using vaccum. 
 ### Material list
-|Material|Source|
-|--------|------|
-|Syringe Pump|To be added|
-|Syringe Pump Controller|To be added|
-|Valve|To be added|
-|Valve Controller|To be added|
+|Material|Source|Comments|
+|--------|------|--------|
+|Syringe Pump and Controller|[Amazon,ASIN: B0BMFJN8YX](https://www.amazon.com/LeTkingok-Injection-Propeller-Laboratory-Dispenser/dp/B0BMFJN8YX/ref=sr_1_3?crid=RNVX1HMA3HSP&dib=eyJ2IjoiMSJ9.9BA6fUVXg3LrKzPnY26Wj7eadsGfdJbIMJCgaDH-ERCf1bGzhkwrqLEYrTAoGPrtKxGwmie8NfH9GLnCgWM4P1FsWlY2rFgVcQlO1VD6XbJCc2p_pu72hhN7C-LNor2mUfQ4mmNSF6hqcqNJzTWQR3aHTa8vH7jlqfiBPfRlVqtg3tUL2GaSbHMexn3LQYwBH-dXz8LihltSvFbzX8Ci2_P2ckOoRIIgPmvspVFyz36gk-sthsfKlSqlq3gG81NCHXnV11LKpH-gEXyrgu5lrEiMxkEXFpBB3mV4qykHWos.MnlOHuRl9nspxmzqD2CUhAHVH5uFSGYI7j40Wyn5LIQ&dib_tag=se&keywords=syringe%2Bpump&qid=1752007670&s=industrial&sprefix=syringe%2Bpum%2Cindustrial%2C148&sr=1-3&th=1)|NA|
+|Valve|[VICI EMHMA-CE](https://www.artisantg.com/PLC/84698-8/VICI-EMHMA-CE-Motor-Gearbox-Assembly-Valve-Actuator?srsltid=AfmBOoq9cZVolkv1iidhZU6-FpNaiEPQjOHPMNiQOcf1hzfP-Om_SAG7)|We purchased used ones from random EBay sellers|
+|Valve Controller|[VICI EMHCA-CE](https://www.artisantg.com/PLC/84194-4/VICI-EMHCA-CE-Multiposition-Actuator-Control-Module-with-AC-Power-Supply?srsltid=AfmBOopTbHQWbIOQBgDSo29P4nXSQqDI0YAU9dkEQmvLYRTucbwGfigQ)|We purchased used ones from random EBay sellers|
 ## Software
 ### Conda environment Setup
 ```bash 
