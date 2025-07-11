@@ -12,4 +12,4 @@ The port of each valve can be controlled by writing formatted serial message to 
 - `"XGOY\r"` asks the driver to select port Y on valve X.
 - `"XCP\r"` asks the driver to return the current port of valve X.
 # Further reading
-- See [VicValve.py](VicValve.py) for details on how to communicate with the driver for controlling the valves.
+- See [VicValve.py](ViciValve.py) for details on how to communicate with the driver for controlling the valves.
