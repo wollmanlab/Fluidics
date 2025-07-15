@@ -2,29 +2,37 @@ import pandas as pd
 import numpy as np
 from fileu import *
 class Protocol:
+    """
+    Definition of the superclass Protocol
+    For all the methods defined below,
+    chambers is an array holding all chambers the protocol should run
+    Please refer to the README of the Protocol Class for meaning of port, chamber, volume, speed and pause.
+    """
     def __init__(self,gui=False):
-        self.verbose=True
-        self.protocols = {}
+        self.verbose=True # When in verbose mode, update_user() will record the input message to the log.
+        self.protocols = {} # A dictionary for holding all the protocols (functions).
 
         self.simulate = False
-        self.vacume = False
+        self.vacume = False # True if vacuum is used to remove solution from chamber.
 
-        self.chamber_volume = 3
-        self.flush_volume = 1.5
-        self.prime_volume = 2
-        self.rinse_volume = 3
-        self.hybe_volume = 3
-        self.mixes = 3
+        self.chamber_volume = 3 # Volume of one chamber, in the unit of mL
+        self.flush_volume = 1.5 # Unknown meaning, not used anywhere
+        self.prime_volume = 2 # Volume of the fluid for priming to fill all the dead volume, in the unit of mL.
+        self.rinse_volume = 3 # Volume of the fluid for rinsing one chamber, in the unit of mL
+        self.hybe_volume = 3 # Volume of the hybridization mixture for one chamber, in the unit of mL
+        
+        self.mixes = 3 # Number of mixes to do during hybridization.
 
-        self.rinse_time = 60
-        self.hybe_time = 600
-        self.max_speed = 1
-        self.speed = 1
-        self.closed_speed = 0.3
+        self.rinse_time = 60 # The duration for one rinse of the chamber, in the unit of sec.
+        self.hybe_time = 600 # The duration for one hybridization, in the unit of sec.
+        self.max_speed = 1 # The maximum speed allowed for the fluidic flow, 1 means 100% here.
+        self.speed = 1 # The speed of the protocol
+        self.closed_speed = 0.3 # The speed when a closed (sealed) chamber is used rather than an open chamber.
         self.wait_factor = 0
-        self.speed_conversion = 1.5
-        self.primed = False
+        self.speed_conversion = 1.5 # 1/(maximum_flow_rate) in the unit of sec/mL. See README of Protocol Class for detailed explanation.
+        self.primed = False # Indicating whether the fluidic system has been primed or not to fill all dead volume
 
+        # Add protocols to the dictionary.
         self.protocols['Valve'] = self.valve
         self.protocols['Clean'] = self.clean
         self.protocols['Hybe'] = self.hybe
@@ -52,49 +60,67 @@ class Protocol:
         self.protocols['dendcyclegradient'] = self.dendcyclegradient
         self.protocols['dendgradient'] = self.dendgradient
 
+    # update_user() is for writing messages to the log
     def update_user(self,message,level=20,logger='Protocol'):
         logger = self.device +'***' + logger
         if self.verbose:
             update_user(message,level=level,logger=logger)
             
+    # get_steps():
+    # Call the method corresponding to the protocol to return the dataframe of the protocol.
+    # protocol: the name of the protocol
+    # chambers: an array specifying the chambers where the protocol should be run
+    # other: other arguments the protocol need besides chamber.
     def get_steps(self,protocol,chambers,other):
         steps = self.protocols[protocol](chambers,other)
         self.update_user('Executing Protocol:')
         self.update_user(steps)
         return steps
-    
+
+    # wait(): wait for pause (in the unit of sec) amount of time. 
     def wait(self,pause):
         steps = []
         steps.append(self.format(port='',volume=0,speed=self.max_speed,pause=pause,direction='Wait'))
         return pd.concat(steps,ignore_index=True)
-
+    
+    # replace_volume(): Replace the solution in user specified chambers and incubate for pause amount of time.
     def replace_volume(self,chambers,port,volume,speed=0,pause=0):
         if speed == 0:
             speed = self.speed
         steps = []
         if self.vacume:
-            # Empty Wells First
+            # Empty all chambers by vacuum
             for chamber in chambers:
                 steps.append(self.empty_chamber(chamber,volume=volume,speed=speed,pause=0))
+            # Turn off vacuum by switching to the port 'Vacume_Waste'
             steps.append(self.empty_chamber('Waste',volume=0,speed=0,pause=0))
+            # Add liquid to all chambers
             for chamber in chambers:
                 steps.append(self.add_liquid(port,chamber,volume,speed=speed,pause=0))
         else:
             for chamber in chambers:
                 steps.append(self.replace_volume_single(port,chamber,volume,speed=speed,pause=0))
+
+        # Estimate total amount of time consumed
         expected_time = pd.concat(steps,ignore_index=True)['time_estimate']
         expected_time =expected_time.sum()-expected_time[0:6].sum()
+        
+        # If user specified incubation time is longer than the estimated total, then wait for the difference
         pause = np.max([pause-expected_time,0])
         steps.append(self.wait(pause))
         return pd.concat(steps,ignore_index=True)
-    
+
+    # replace_volume_mix(): Replace the solution in user specified chambers and incubate for pasue amount of time with periodic mixing.
+    # mixes: Number of mixes to do during incubation.
     def replace_volume_mix(self,chambers,port,volume,speed=0,pause=0,mixes=0):
         if speed == 0:
             speed = self.speed
         steps = []
+        # Replace solution in all chambers without any pause (incubation)
         steps.append(self.replace_volume(chambers,port,volume,speed=speed,pause=0))
         if mixes>0:
-            steps.append(self.wait(99999))
+            # 99999 just serves as a marker, the exact waiting time will be calculated later
+            steps.append(self.wait(99999)) 
             for step in range(mixes):
                 steps.append(self.mix(chambers,self.hybe_volume))
                 steps.append(self.wait(99999))
@@ -104,6 +130,7 @@ class Protocol:
             expected_time = np.sum(time_estimate[pause_estimate!=99999])
             total_pause_time = np.max([pause-expected_time,0])
             time_estimate[pause_estimate==99999] = 1+total_pause_time/(mixes+1)
+            # Calculate the exact wait time
             pause_estimate[pause_estimate==99999] = total_pause_time/(mixes+1)
             steps['time_estimate'] = time_estimate
             steps['pause'] = pause_estimate
@@ -111,7 +138,9 @@ class Protocol:
         else:
             steps.append(self.wait(pause))
             return pd.concat(steps,ignore_index=True)
-    
+
+    # add_volume():
+    # Add solution to user specified chambers.
     def add_volume(self,chambers,port,volume,speed=0,pause=0):
         if speed == 0:
             speed = self.speed
@@ -123,6 +152,9 @@ class Protocol:
         steps.append(self.wait(pause))
         return pd.concat(steps,ignore_index=True)
 
+    # replace_volume_closed():
+    # Replace solution in user user specified closed chambers.
+    # n_steps: break down the injection into n_steps to avoid rapid buildup of pressure in the closed chamber
     def replace_volume_closed(self,chambers,port,volume,speed=0,pause=0,n_steps=1):
         if speed == 0:
             speed = self.speed
@@ -135,10 +167,12 @@ class Protocol:
             steps.append(self.wait(pause))
         return pd.concat(steps,ignore_index=True)
 
+    # format(): return the dataframe based on user specified port, volume, speed, pause and direction
     def format(self,port='A',volume=0,speed=1,pause=0,direction='Forward'):
         time_estimate = ((float(volume)/float(speed))*self.speed_conversion)+1+float(pause)
         return pd.DataFrame([port,volume,speed,pause,direction,time_estimate],index = ['port','volume','speed','pause','direction','time_estimate']).T
 
+    # mix(): mix the solution inside user specified chambers by drawing all solution up and then re-injecting into the chamber.
     def mix(self,chambers,volume):
         steps = []
         for chamber in chambers:
